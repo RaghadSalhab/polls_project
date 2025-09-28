@@ -1,6 +1,5 @@
 from polls.repositories.choice_repository import ChoiceRepository
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-
 from polls.repositories.question_repository import QuestionRepository
 
 class ChoiceService:

@@ -7,7 +7,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from polls.serializers import UserQuestionSerializer,QuestionSerializer
-# ------------------- Users -------------------
+from rest_framework import generics
+
 class UserViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
@@ -48,8 +49,6 @@ class UserViewSet(viewsets.ViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 # ------------------- Register -------------------
-from rest_framework import generics
-
 class UserRegisterView(generics.CreateAPIView):
     serializer_class = UserRegisterSerializer
     permission_classes = [AllowAny]

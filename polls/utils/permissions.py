@@ -1,4 +1,4 @@
-# polls_app/utils/permissions.py
+# polls/utils/permissions.py
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 class IsOwnerOrReadOnly(BasePermission):

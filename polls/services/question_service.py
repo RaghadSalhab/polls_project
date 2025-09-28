@@ -2,8 +2,6 @@
 from polls.repositories.choice_repository import ChoiceRepository
 from polls.repositories.question_repository import QuestionRepository
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-
-
 class QuestionService:
 
     # ----------- Questions -----------
@@ -65,4 +63,3 @@ class QuestionService:
         if question.created_by != user:
             raise PermissionDenied("You cannot delete this question")
         QuestionRepository.delete_question(question_id)
-
