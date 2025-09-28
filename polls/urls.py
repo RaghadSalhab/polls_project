@@ -1,7 +1,8 @@
 # polls/urls.py
 from django.urls import path, include
+from polls.views.choice_views import ChoiceViewSet
 from rest_framework_nested import routers
-from polls.views.question_views import QuestionViewSet, ChoiceViewSet
+from polls.views.question_views import QuestionViewSet
 from polls.views.user_views import UserViewSet, UserQuestionsViewSet
 
 router = routers.DefaultRouter()

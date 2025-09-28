@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from polls.services.user_service import UserService
-from polls.services.poll_service import PollService
+from polls.services.question_service import QuestionService
 from polls.serializers import UserSerializer, UserRegisterSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
@@ -65,7 +65,7 @@ class UserQuestionsViewSet(viewsets.ViewSet):
 
     def list(self, request, user_pk=None):
         try:
-            questions = PollService.list_questions_for_user(user_pk)
+            questions = QuestionService.list_questions_for_user(user_pk)
         except ObjectDoesNotExist:
             return Response({"detail": "User not found"}, status=404)
 
@@ -74,11 +74,10 @@ class UserQuestionsViewSet(viewsets.ViewSet):
 
     def retrieve(self, request, pk=None, user_pk=None):
         try:
-            question = PollService.get_question(pk)
+            question = QuestionService.get_question(pk)
         except ObjectDoesNotExist:
             return Response({"detail": "Not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        # تحقق من ملكية السؤال
         if str(question.created_by.id) != str(user_pk):
             return Response({"detail": "Not found"}, status=status.HTTP_404_NOT_FOUND)
 
