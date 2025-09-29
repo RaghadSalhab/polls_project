@@ -1,13 +1,15 @@
-from django.db import models
+# models/choice.py
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
+from .database import Base
 from .question import Question
 
-class Choice(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='choices')
-    choice_text = models.CharField(max_length=200)
-    votes = models.IntegerField(default=0)
+class Choice(Base):
+    __tablename__ = "polls_choice"
 
-    def __str__(self):
-        return self.choice_text
+    id = Column(Integer, primary_key=True)
+    question_id = Column(Integer, ForeignKey("polls_question.id"), nullable=False)
+    choice_text = Column(String(200), nullable=False)
+    votes = Column(Integer, default=0, nullable=False)
 
-    class Meta:
-        app_label = 'polls'
+    question = relationship("Question", back_populates="choices")

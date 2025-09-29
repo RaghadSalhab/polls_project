@@ -1,35 +1,29 @@
 # polls/serializers.py
 from rest_framework import serializers
-from django.contrib.auth.models import User
-#from polls.models.user import User
-from polls.models.question import Question
-from polls.models.choice import Choice
-from rest_framework import serializers
-from django.contrib.auth.models import User
-from django.contrib.auth.password_validation import validate_password
-class ChoiceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Choice
-        fields = ["id", "choice_text", "votes", "question_id"]
 
-class QuestionSerializer(serializers.ModelSerializer):
+class ChoiceSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    choice_text = serializers.CharField(max_length=200)
+    votes = serializers.IntegerField()
+    question_id = serializers.IntegerField()
+
+class QuestionSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    question_text = serializers.CharField(max_length=200)
+    pub_date = serializers.DateTimeField()
+    created_by_id = serializers.IntegerField()
     choices = ChoiceSerializer(many=True, read_only=True)
-    class Meta:
-        model = Question
-        fields = ["id", "question_text", "pub_date", "created_by", "choices"]
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ["id", "username", "email"]
+class UserSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    username = serializers.CharField(max_length=150)
+    email = serializers.CharField(max_length=254)
 
-class UserRegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
-    password2 = serializers.CharField(write_only=True, required=True)
-
-    class Meta:
-        model = User
-        fields = ('username', 'email', 'password', 'password2')
+class UserRegisterSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=150)
+    email = serializers.CharField(max_length=254)
+    password = serializers.CharField(write_only=True)
+    password2 = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
@@ -37,16 +31,11 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        user = User.objects.create(
-            username=validated_data['username'],
-            email=validated_data['email']
-        )
-        user.set_password(validated_data['password'])
-        user.save()
+        from polls.repositories.user_repository import UserRepository
+        user = UserRepository.create_user(validated_data['username'], validated_data['email'], validated_data['password'])
         return user
 
-
-class UserQuestionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Question
-        fields = ["id", "question_text", "pub_date"]
+class UserQuestionSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    question_text = serializers.CharField(max_length=200)
+    pub_date = serializers.DateTimeField()

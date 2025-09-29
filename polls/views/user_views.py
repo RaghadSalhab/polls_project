@@ -49,15 +49,38 @@ class UserViewSet(viewsets.ViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 # ------------------- Register -------------------
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.response import Response
+from rest_framework import status
+
+from rest_framework import generics, status
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.response import Response
+from rest_framework import status
+
 class UserRegisterView(generics.CreateAPIView):
     serializer_class = UserRegisterSerializer
     permission_classes = [AllowAny]
 
-    def perform_create(self, serializer):
-        username = serializer.validated_data["username"]
-        email = serializer.validated_data["email"]
-        password = serializer.validated_data["password"]
-        UserService.create_user(username, email, password)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = UserService.create_user(
+            serializer.validated_data["username"],
+            serializer.validated_data["email"],
+            serializer.validated_data["password"]
+        )
+        # توليد التوكن
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            "user": serializer.data,
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),
+        }, status=status.HTTP_201_CREATED)
 
 class UserQuestionsViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
@@ -68,6 +91,7 @@ class UserQuestionsViewSet(viewsets.ViewSet):
         except ObjectDoesNotExist:
             return Response({"detail": "User not found"}, status=404)
 
+        print(f"Returning {len(questions)} questions for user {user_pk}")  
         serializer = UserQuestionSerializer(questions, many=True)
         return Response(serializer.data)
 

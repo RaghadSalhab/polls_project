@@ -1,41 +1,95 @@
-# polls/repositories/question_repository.py
-from polls.models.choice import Choice
-from django.core.exceptions import ObjectDoesNotExist
+# repositories/question_repository.py
+from sqlalchemy.orm import Session, joinedload
 from polls.models.question import Question
+from polls.models.choice import Choice
+from polls.models.database import SessionLocal
+from polls.models.database import Base, engine
 
 class QuestionRepository:
 
-    # ----------- Questions -----------
+    @staticmethod
+    def list_questions(search: str = None):
+        with SessionLocal() as session:
+            query = session.query(Question).options(joinedload(Question.choices))
+            if search:
+                query = query.filter(Question.question_text.ilike(f"%{search}%"))
+            return query.all()
+
+    def list_questions_for_user(user_id: int):
+        with SessionLocal() as session:
+            questions = session.query(Question)\
+                            .filter(Question.created_by_id == user_id)\
+                            .all()
+            print(f"Found {len(questions)} questions for user {user_id}")
+            return questions
 
     @staticmethod
-    def list_questions(search=None):
-        qs = Question.objects.all().prefetch_related('choices')
-        if search:
-            qs = qs.filter(question_text__icontains=search)
-        return qs
+    def get_question(question_id: int):
+        with SessionLocal() as session:
+            return session.query(Question)\
+                        .options(joinedload(Question.created_by), joinedload(Question.choices))\
+                        .filter(Question.id == question_id)\
+                        .first()
+
 
     @staticmethod
-    def list_questions_for_user(user_id):
-        return Question.objects.filter(created_by_id=user_id).prefetch_related('choices')
+    def create_question(user_id: int, question_text: str, choices: list[str] = None):
+        with SessionLocal() as session:
+
+            question = Question(created_by_id=user_id, question_text=question_text)
+            session.add(question)
+            session.flush()  
+
+            if choices:
+                for choice_text in choices:
+                    choice = Choice(question_id=question.id, choice_text=choice_text, votes=0)
+                    session.add(choice)
+
+            session.commit()
+
+            question = session.query(Question)\
+                              .options(joinedload(Question.choices))\
+                              .filter(Question.id == question.id)\
+                              .first()
+            return question
 
     @staticmethod
-    def get_question(question_id):
-        try:
-            return Question.objects.prefetch_related('choices').get(id=question_id)
-        except Question.DoesNotExist:
-            return None
+    def update_question(question_id: int, question_text: str, choices: list[dict] = None):
+        with SessionLocal() as session:
+            question = session.query(Question)\
+                              .options(joinedload(Question.choices))\
+                              .filter(Question.id == question_id)\
+                              .first()
+            if not question:
+                return None
+
+            question.question_text = question_text
+
+            if choices is not None:
+                for choice_data in choices:
+                    choice_id = choice_data.get("id")
+                    choice_text = choice_data.get("choice_text")
+
+                    if choice_id:
+                        choice = next((c for c in question.choices if c.id == choice_id), None)
+                        if choice:
+                            choice.choice_text = choice_text
+                    else:
+                        new_choice = Choice(question_id=question.id, choice_text=choice_text, votes=0)
+                        session.add(new_choice)
+
+            session.commit()
+
+            question = session.query(Question)\
+                              .options(joinedload(Question.choices))\
+                              .filter(Question.id == question_id)\
+                              .first()
+            return question
 
     @staticmethod
-    def create_question(user, question_text):
-        return Question.objects.create(created_by=user, question_text=question_text)
-
-    @staticmethod
-    def update_question(question_id, question_text):
-        question = Question.objects.get(id=question_id)
-        question.question_text = question_text
-        question.save()
-        return question
-
-    @staticmethod
-    def delete_question(question_id):
-        Question.objects.filter(id=question_id).delete()
+    def delete_question(question_id: int):
+        with SessionLocal() as session:
+            question = session.query(Question).filter(Question.id == question_id).first()
+            if question:
+                session.delete(question)
+                session.commit()

@@ -1,4 +1,4 @@
-# polls/services/stats_service.py
+# services/stats_service.py
 from polls.repositories.stats_repository import StatsRepository
 
 class StatsService:
@@ -8,7 +8,7 @@ class StatsService:
         return StatsRepository.top_voted_question()
 
     @staticmethod
-    def get_question_votes(question_id):
+    def get_question_votes(question_id: int):
         return StatsRepository.question_votes(question_id)
 
     @staticmethod

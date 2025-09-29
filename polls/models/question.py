@@ -1,14 +1,18 @@
-from django.db import models
-from django.contrib.auth.models import User
-#from .user import User
+# models/question.py
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
+from .database import Base
+from .user import User
+from datetime import datetime
 
-class Question(models.Model):
-    question_text = models.CharField(max_length=200)
-    pub_date = models.DateTimeField('date published', auto_now_add=True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='questions', default=1)
 
-    def __str__(self):
-        return self.question_text
+class Question(Base):
+    __tablename__ = "polls_question"
+    id = Column(Integer, primary_key=True)
+    question_text = Column(String(200), nullable=False)
+    pub_date = Column(DateTime, nullable=False, default=datetime.utcnow)  # <-- هنا
+    created_by_id = Column(Integer, ForeignKey("auth_user.id"), nullable=False)
 
-    class Meta:
-        app_label = 'polls'
+    created_by = relationship("User", back_populates="questions")
+    choices = relationship("Choice", back_populates="question", cascade="all, delete-orphan")
