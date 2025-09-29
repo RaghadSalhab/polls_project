@@ -13,55 +13,57 @@ class UserViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     def list(self, request):
-        users = UserService.list_users()
+        users = UserService.list_users(request.db)
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
         try:
-            user = UserService.get_user(pk)
+            user = UserService.get_user(request.db, pk)
         except ObjectDoesNotExist:
-            return Response({"detail": "Not found"}, status=status.HTTP_404_NOT_FOUND)
-
+            return Response({"detail": "Not found"}, status=404)
         serializer = UserSerializer(user)
         return Response(serializer.data)
 
     def update(self, request, pk=None):
-        data = request.data
         try:
-            updated_user = UserService.update_user(request.user, pk, **data)
+            updated_user = UserService.update_user(request.db, request.user, pk, **request.data)
         except ObjectDoesNotExist:
-            return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "User not found"}, status=404)
         except PermissionDenied as e:
-            return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
-
+            return Response({"detail": str(e)}, status=403)
         serializer = UserSerializer(updated_user)
         return Response(serializer.data)
 
     def destroy(self, request, pk=None):
         try:
-            UserService.delete_user(request.user, pk)
+            UserService.delete_user(request.db, request.user, pk)
         except ObjectDoesNotExist:
-            return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "User not found"}, status=404)
         except PermissionDenied as e:
-            return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": str(e)}, status=403)
+        return Response(status=204)
 
-        return Response(status=status.HTTP_204_NO_CONTENT)
+class UserQuestionsViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request, user_pk=None):
+        questions = QuestionService.list_questions_for_user(request.db, user_pk)
+        serializer = UserQuestionSerializer(questions, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None, user_pk=None):
+        question = QuestionService.get_question(request.db, pk)
+        if str(question.created_by.id) != str(user_pk):
+            return Response({"detail": "Not found"}, status=404)
+        serializer = QuestionSerializer(question)
+        return Response(serializer.data)
 
 # ------------------- Register -------------------
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
-from rest_framework import status
-
 from rest_framework import generics, status
-from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from rest_framework_simplejwt.tokens import RefreshToken
-
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.response import Response
-from rest_framework import status
-
 class UserRegisterView(generics.CreateAPIView):
     serializer_class = UserRegisterSerializer
     permission_classes = [AllowAny]
@@ -82,27 +84,3 @@ class UserRegisterView(generics.CreateAPIView):
             "access": str(refresh.access_token),
         }, status=status.HTTP_201_CREATED)
 
-class UserQuestionsViewSet(viewsets.ViewSet):
-    permission_classes = [IsAuthenticated]
-
-    def list(self, request, user_pk=None):
-        try:
-            questions = QuestionService.list_questions_for_user(user_pk)
-        except ObjectDoesNotExist:
-            return Response({"detail": "User not found"}, status=404)
-
-        print(f"Returning {len(questions)} questions for user {user_pk}")  
-        serializer = UserQuestionSerializer(questions, many=True)
-        return Response(serializer.data)
-
-    def retrieve(self, request, pk=None, user_pk=None):
-        try:
-            question = QuestionService.get_question(pk)
-        except ObjectDoesNotExist:
-            return Response({"detail": "Not found"}, status=status.HTTP_404_NOT_FOUND)
-
-        if str(question.created_by.id) != str(user_pk):
-            return Response({"detail": "Not found"}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = QuestionSerializer(question)
-        return Response(serializer.data)
