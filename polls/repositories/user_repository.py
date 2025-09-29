@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-
+#from polls.models.user import User
 class UserRepository:
 
     @staticmethod

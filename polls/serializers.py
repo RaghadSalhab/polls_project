@@ -1,6 +1,7 @@
 # polls/serializers.py
 from rest_framework import serializers
 from django.contrib.auth.models import User
+#from polls.models.user import User
 from polls.models.question import Question
 from polls.models.choice import Choice
 from rest_framework import serializers
