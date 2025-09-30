@@ -73,7 +73,6 @@ class UserRegisterView(generics.CreateAPIView):
             serializer.validated_data["email"],
             serializer.validated_data["password"]
         )
-        # توليد التوكن
         refresh = RefreshToken.for_user(user)
         return Response({
             "user": serializer.data,

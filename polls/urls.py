@@ -9,7 +9,7 @@ from polls.views.user_views import UserViewSet, UserQuestionsViewSet
 router = routers.DefaultRouter()
 router.register(r'questions', QuestionViewSet, basename='questions')
 router.register(r'users', UserViewSet, basename='users')
-router.register(r'stats', StatsViewSet, basename='stats')   # هنا سجلنا stats
+router.register(r'stats', StatsViewSet, basename='stats')
 
 # nested: /questions/{question_id}/choices/
 choices_router = routers.NestedDefaultRouter(router, r'questions', lookup='question')

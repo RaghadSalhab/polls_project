@@ -7,16 +7,14 @@ class QuestionRepository:
 
     @staticmethod
     def list_questions(search: str = None):
-        session = Session()
-        query = session.query(Question).options(joinedload(Question.choices))
+        query = Session.query(Question).options(joinedload(Question.choices))
         if search:
             query = query.filter(Question.question_text.ilike(f"%{search}%"))
         return query.all()
 
     @staticmethod
     def list_questions_for_user(user_id: int):
-        session = Session()
-        questions = session.query(Question)\
+        questions = Session.query(Question)\
                            .filter(Question.created_by_id == user_id)\
                            .all()
         print(f"Found {len(questions)} questions for user {user_id}")
@@ -24,32 +22,29 @@ class QuestionRepository:
 
     @staticmethod
     def get_question(question_id: int):
-        session = Session()
-        return session.query(Question)\
+        return Session.query(Question)\
                       .options(joinedload(Question.created_by), joinedload(Question.choices))\
                       .filter(Question.id == question_id)\
                       .first()
 
     @staticmethod
     def create_question(user_id: int, question_text: str, choices: list[str] = None):
-        session = Session()
         question = Question(created_by_id=user_id, question_text=question_text)
-        session.add(question)
-        session.flush()  # لازم flush لحجز ID
+        Session.add(question)
+        Session.flush()  
 
         if choices:
             for choice_text in choices:
                 choice = Choice(question_id=question.id, choice_text=choice_text, votes=0)
-                session.add(choice)
+                Session.add(choice)
 
-        session.commit()
-        session.refresh(question)
+        Session.commit()
+        Session.refresh(question)
         return question
 
     @staticmethod
     def update_question(question_id: int, question_text: str, choices: list[dict] = None):
-        session = Session()
-        question = session.query(Question)\
+        question = Session.query(Question)\
                           .options(joinedload(Question.choices))\
                           .filter(Question.id == question_id)\
                           .first()
@@ -67,16 +62,15 @@ class QuestionRepository:
                         choice.choice_text = choice_text
                 else:
                     new_choice = Choice(question_id=question.id, choice_text=choice_text, votes=0)
-                    session.add(new_choice)
+                    Session.add(new_choice)
 
-        session.commit()
-        session.refresh(question)
+        Session.commit()
+        Session.refresh(question)
         return question
 
     @staticmethod
     def delete_question(question_id: int):
-        session = Session()
-        question = session.query(Question).filter(Question.id == question_id).first()
+        question = Session.query(Question).filter(Question.id == question_id).first()
         if question:
-            session.delete(question)
-            session.commit()
+            Session.delete(question)
+            Session.commit()

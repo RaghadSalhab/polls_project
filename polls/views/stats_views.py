@@ -8,7 +8,7 @@ class StatsViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=["get"])
     def top_question(self, request):
-        result = StatsService.get_top_question(request.db)
+        result = StatsService.get_top_question()
         if result is None:
             return Response({"detail": "No questions found"}, status=404)
         serializer = QuestionSerializer(result)
@@ -16,7 +16,7 @@ class StatsViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=["get"])
     def top_choice(self, request):
-        result = StatsService.get_top_choice(request.db)
+        result = StatsService.get_top_choice()
         if result is None:
             return Response({"detail": "No choices found"}, status=404)
         serializer = ChoiceSerializer(result)
@@ -24,12 +24,12 @@ class StatsViewSet(viewsets.ViewSet):
 
     @action(detail=True, methods=["get"])
     def question_votes(self, request, pk=None):
-        votes = StatsService.get_question_votes(request.db, pk)
+        votes = StatsService.get_question_votes(pk)
         return Response({"question_id": pk, "votes": votes})
 
     @action(detail=False, methods=["get"])
     def questions_with_votes(self, request):
-        results = StatsService.list_questions_with_votes(request.db)
+        results = StatsService.list_questions_with_votes()
         data = [
             {
                 "question": QuestionSerializer(q).data,

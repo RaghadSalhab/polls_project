@@ -22,7 +22,7 @@ class UserRepository:
             is_active=True
         )
         Session.add(user)
-        Session.flush()   # يضيفه بدون ما يعمل commit (الميدل وير بتكمل)
+        Session.flush() 
         Session.refresh(user)
         return user
 

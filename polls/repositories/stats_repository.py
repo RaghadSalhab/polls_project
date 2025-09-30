@@ -2,13 +2,14 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy import func
 from polls.models.question import Question
 from polls.models.choice import Choice
+from polls.models.database import Session
 
 class StatsRepository:
 
     @staticmethod
-    def top_voted_question(session):
+    def top_voted_question():
         return (
-            session.query(Question)
+            Session.query(Question)
             .options(joinedload(Question.choices))
             .outerjoin(Question.choices)
             .group_by(Question.id)
@@ -18,21 +19,21 @@ class StatsRepository:
         )
 
     @staticmethod
-    def question_votes(session, question_id: int):
+    def question_votes(question_id: int):
         return (
-            session.query(func.coalesce(func.sum(Choice.votes), 0))
+            Session.query(func.coalesce(func.sum(Choice.votes), 0))
             .filter(Choice.question_id == question_id)
             .scalar()
         )
 
     @staticmethod
-    def top_voted_choice(session):
-        return session.query(Choice).order_by(Choice.votes.desc()).first()
+    def top_voted_choice():
+        return Session.query(Choice).order_by(Choice.votes.desc()).first()
 
     @staticmethod
-    def all_questions_with_votes(session):
+    def all_questions_with_votes():
         return (
-            session.query(
+            Session.query(
                 Question,
                 func.coalesce(func.sum(Choice.votes), 0).label("total_votes"),
             )
