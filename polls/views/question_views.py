@@ -11,12 +11,12 @@ class QuestionViewSet(viewsets.ViewSet):
 
     def list(self, request):
         search = request.query_params.get("search")
-        questions = QuestionService.list_questions(request.db, search)
+        questions = QuestionService.list_questions(search)
         serializer = QuestionSerializer(questions, many=True)
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
-        question = QuestionService.get_question(request.db, pk)
+        question = QuestionService.get_question(pk)
         serializer = QuestionSerializer(question)
         return Response(serializer.data)
     
@@ -24,8 +24,7 @@ class QuestionViewSet(viewsets.ViewSet):
         user = request.user
         question_text = request.data.get("question_text")
         choices = request.data.get("choices", [])
-
-        question = QuestionService.create_question(request.db, user, question_text, choices)
+        question = QuestionService.create_question(user, question_text, choices)
         serializer = QuestionSerializer(question)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
@@ -33,18 +32,17 @@ class QuestionViewSet(viewsets.ViewSet):
         question_text = request.data.get("question_text")
         choices = request.data.get("choices")
         user = request.user
-
-        question = QuestionService.update_question(request.db, user, pk, question_text, choices)
+        question = QuestionService.update_question(user, pk, question_text, choices)
         serializer = QuestionSerializer(question)
         return Response(serializer.data)
 
     def destroy(self, request, pk=None):
-        QuestionService.delete_question(request.db, request.user, pk)
+        QuestionService.delete_question(request.user, pk)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=["post"])
     def vote(self, request, pk=None):
         choice_id = request.data.get("choice_id")
-        choice = ChoiceService.vote(request.db, choice_id) 
+        choice = ChoiceService.vote(choice_id)  
         serializer = ChoiceSerializer(choice)
         return Response(serializer.data)

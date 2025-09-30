@@ -1,4 +1,3 @@
-# services/stats_service.py
 from polls.repositories.stats_repository import StatsRepository
 
 class StatsService:

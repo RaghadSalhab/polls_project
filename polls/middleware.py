@@ -1,15 +1,14 @@
-from polls.models.database import SessionLocal
+from polls.models.database import Session
 
 def db_session_middleware(get_response):
     def middleware(request):
-        request.db = SessionLocal()
         try:
             response = get_response(request)
-            request.db.commit()
+            Session.commit()  
         except Exception:
-            request.db.rollback()
+            Session.rollback()
             raise
         finally:
-            request.db.close()
+            Session.remove()  
         return response
     return middleware
