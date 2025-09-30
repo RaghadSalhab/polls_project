@@ -20,5 +20,3 @@ if __name__ == "__main__":
         conn.close()
     except Exception as e:
         print("Connection failed:", e)
-import pymysql
-pymysql.install_as_MySQLdb()
