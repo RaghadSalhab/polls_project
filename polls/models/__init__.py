@@ -11,7 +11,6 @@ from polls.models.database import Base, engine
 from polls.models.question import Question
 from polls.models.choice import Choice
 
-# هذا ينشئ الجداول إذا ما كانت موجودة مسبقاً
 Base.metadata.create_all(bind=engine)
 
 print("Tables are ready!")
