@@ -3,8 +3,10 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from polls.services.question_service import QuestionService
 from polls.services.choice_service import ChoiceService
-from polls.serializers import QuestionSerializer, ChoiceSerializer
+from polls.schemas.question import QuestionSchema 
+from polls.schemas.choice import ChoiceSchema 
 from rest_framework.permissions import IsAuthenticated
+from polls.models.database import Session
 
 class QuestionViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
@@ -12,29 +14,33 @@ class QuestionViewSet(viewsets.ViewSet):
     def list(self, request):
         search = request.query_params.get("search")
         questions = QuestionService.list_questions(search)
-        serializer = QuestionSerializer(questions, many=True)
-        return Response(serializer.data)
+        schema = QuestionSchema(many=True)
+        data = schema.dump(questions)
+        return Response(data)
 
     def retrieve(self, request, pk=None):
         question = QuestionService.get_question(pk)
-        serializer = QuestionSerializer(question)
-        return Response(serializer.data)
+        schema = QuestionSchema()
+        data = schema.dump(question)
+        return Response(data)
     
     def create(self, request):
         user = request.user
         question_text = request.data.get("question_text")
         choices = request.data.get("choices", [])
         question = QuestionService.create_question(user, question_text, choices)
-        serializer = QuestionSerializer(question)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        schema = QuestionSchema()
+        data = schema.dump(question)
+        return Response(data, status=status.HTTP_201_CREATED)
     
     def update(self, request, pk=None):
         question_text = request.data.get("question_text")
         choices = request.data.get("choices")
         user = request.user
         question = QuestionService.update_question(user, pk, question_text, choices)
-        serializer = QuestionSerializer(question)
-        return Response(serializer.data)
+        schema = QuestionSchema()
+        data = schema.dump(question)
+        return Response(data)
 
     def destroy(self, request, pk=None):
         QuestionService.delete_question(request.user, pk)
@@ -44,5 +50,6 @@ class QuestionViewSet(viewsets.ViewSet):
     def vote(self, request, pk=None):
         choice_id = request.data.get("choice_id")
         choice = ChoiceService.vote(choice_id)  
-        serializer = ChoiceSerializer(choice)
-        return Response(serializer.data)
+        schema = ChoiceSchema()
+        data = schema.dump(choice)
+        return Response(data)

@@ -1,8 +1,10 @@
+from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from polls.services.stats_service import StatsService
-from polls.serializers import QuestionSerializer, ChoiceSerializer
-from rest_framework import viewsets
+from polls.schemas.question import QuestionSchema
+from polls.schemas.choice import ChoiceSchema
+from polls.models.database import Session
 
 class StatsViewSet(viewsets.ViewSet):
 
@@ -11,16 +13,18 @@ class StatsViewSet(viewsets.ViewSet):
         result = StatsService.get_top_question()
         if result is None:
             return Response({"detail": "No questions found"}, status=404)
-        serializer = QuestionSerializer(result)
-        return Response(serializer.data)
+        schema = QuestionSchema()
+        data = schema.dump(result)
+        return Response(data)
 
     @action(detail=False, methods=["get"])
     def top_choice(self, request):
         result = StatsService.get_top_choice()
         if result is None:
             return Response({"detail": "No choices found"}, status=404)
-        serializer = ChoiceSerializer(result)
-        return Response(serializer.data)
+        schema = ChoiceSchema()
+        data = schema.dump(result)
+        return Response(data)
 
     @action(detail=True, methods=["get"])
     def question_votes(self, request, pk=None):
@@ -32,7 +36,7 @@ class StatsViewSet(viewsets.ViewSet):
         results = StatsService.list_questions_with_votes()
         data = [
             {
-                "question": QuestionSerializer(q).data,
+                "question": QuestionSchema().dump(q),
                 "total_votes": total_votes,
             }
             for q, total_votes in results
