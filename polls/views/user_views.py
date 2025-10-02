@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from rest_framework_simplejwt.tokens import RefreshToken
 from polls.models.database import Session
+from marshmallow import ValidationError
 
 class UserViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
@@ -69,20 +70,19 @@ class UserRegisterView(generics.CreateAPIView):
     permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
-        from marshmallow import ValidationError
-        from polls.schemas.user import UserSchema
 
         schema = UserSchema()
         try:
-            user_data = schema.load(request.data)
+            user = schema.load(request.data) 
         except ValidationError as e:
             return Response({"errors": e.messages}, status=400)
 
         user = UserService.create_user(
-            user_data["username"],
-            user_data["email"],
-            user_data["password"]
+            user.username,
+            user.email,
+            user.password
         )
+
         refresh = RefreshToken.for_user(user)
         return Response({
             "user": schema.dump(user),

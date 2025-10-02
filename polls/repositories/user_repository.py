@@ -1,4 +1,4 @@
-from werkzeug.security import generate_password_hash
+from django.contrib.auth.hashers import make_password
 from polls.models.user import User
 from polls.models.database import Session
 
@@ -17,7 +17,7 @@ class UserRepository:
         user = User(
             username=username,
             email=email,
-            password=password,
+            password=make_password(password),
             is_superuser=is_superuser,
             is_active=True
         )
@@ -26,6 +26,7 @@ class UserRepository:
         Session.refresh(user)
         return user
 
+
     @staticmethod
     def update_user(user_id: int, **kwargs):
         user = Session.query(User).filter(User.id == user_id).first()
@@ -33,7 +34,7 @@ class UserRepository:
             return None
         for attr, value in kwargs.items():
             if attr == "password":
-                value = generate_password_hash(value)
+                value = make_password(value)
             setattr(user, attr, value)
         Session.flush()
         Session.refresh(user)
