@@ -1,32 +1,30 @@
+from marshmallow import ValidationError
 from rest_framework import viewsets, status, generics
 from rest_framework.response import Response
+from polls.schemas.user import UserSchema
+from polls.services.user_service import UserService
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+
 from polls.services.user_service import UserService
 from polls.services.question_service import QuestionService
-from polls.schemas.user import UserSchema
-from polls.schemas.question import QuestionSchema
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from rest_framework_simplejwt.tokens import RefreshToken
-from polls.models.database import Session
-from marshmallow import ValidationError
 
 class UserViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
     def list(self, request):
         users = UserService.list_users()
-        schema = UserSchema(many=True)
-        data = schema.dump(users)
-        return Response(data)
+        return Response(users)
 
     def retrieve(self, request, pk=None):
         try:
             user = UserService.get_user(pk)
         except ObjectDoesNotExist:
             return Response({"detail": "Not found"}, status=404)
-        schema = UserSchema()
-        data = schema.dump(user)
-        return Response(data)
+        return Response(user)
 
     def update(self, request, pk=None):
         try:
@@ -35,9 +33,7 @@ class UserViewSet(viewsets.ViewSet):
             return Response({"detail": "User not found"}, status=404)
         except PermissionDenied as e:
             return Response({"detail": str(e)}, status=403)
-        schema = UserSchema()
-        data = schema.dump(updated_user)
-        return Response(data)
+        return Response(updated_user)
 
     def destroy(self, request, pk=None):
         try:
@@ -54,17 +50,16 @@ class UserQuestionsViewSet(viewsets.ViewSet):
 
     def list(self, request, user_pk=None):
         questions = QuestionService.list_questions_for_user(user_pk)
-        schema = QuestionSchema(many=True)
-        data = schema.dump(questions)
-        return Response(data)
+        return Response(questions)
 
     def retrieve(self, request, pk=None, user_pk=None):
         question = QuestionService.get_question(pk)
-        if str(question.created_by.id) != str(user_pk):
+        if not question or str(question["created_by"]["id"]) != str(user_pk):
             return Response({"detail": "Not found"}, status=404)
-        schema = QuestionSchema()
-        data = schema.dump(question)
-        return Response(data)
+        return Response(question)
+
+
+
     
 class UserRegisterView(generics.CreateAPIView):
     permission_classes = [AllowAny]
