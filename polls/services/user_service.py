@@ -2,15 +2,14 @@
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from polls.repositories.user_repository import UserRepository
 from polls.schemas.user import UserSchema
-from polls.services.cache_manager import get_cache_manager
+from polls.caches.user_cache import UserCache
 
 class UserService:
-    cache = get_cache_manager()
+    cache = UserCache()
 
     @classmethod
     def get_user(cls, user_id: int):
-        cache_key = f"user:{user_id}"
-        cached_data = cls.cache.get(cache_key)
+        cached_data = cls.cache.get_by_id(user_id)
         if cached_data:
             return cached_data
 
@@ -19,25 +18,24 @@ class UserService:
             raise ObjectDoesNotExist("User not found")
 
         data = UserSchema().dump(user)
-        cls.cache.set(cache_key, data, expire=300)
+        cls.cache.set_by_id(user_id, data, expire=300)
         return data
 
     @classmethod
     def list_users(cls):
-        cache_key = "users:list"
-        cached_data = cls.cache.get(cache_key)
+        cached_data = cls.cache.get_list()
         if cached_data:
             return cached_data
 
         users = UserRepository.list_all()
         data = UserSchema(many=True).dump(users)
-        cls.cache.set(cache_key, data, expire=300)
+        cls.cache.set_list(data, expire=300)
         return data
 
     @classmethod
     def create_user(cls, username: str, email: str, password: str):
         user = UserRepository.create_user(username, email, password)
-        cls.cache.delete("users:list")
+        cls.cache.delete_list()
         return UserSchema().dump(user)
 
     @classmethod
@@ -51,8 +49,8 @@ class UserService:
         user = UserRepository.update_user(user_id, **kwargs)
         data = UserSchema().dump(user)
 
-        cls.cache.set(f"user:{user_id}", data, expire=300)
-        cls.cache.delete("users:list")
+        cls.cache.set_by_id(user_id, data, expire=300)
+        cls.cache.delete_list()
         return data
 
     @classmethod
@@ -63,7 +61,7 @@ class UserService:
         if requesting_user.id != user.id and not getattr(requesting_user, "is_superuser", False):
             raise PermissionDenied("You cannot delete this user")
 
-        UserRepository.delete_user_by_id(user_id)
+        UserRepository.delete_by_id(user_id)
 
-        cls.cache.delete(f"user:{user_id}")
-        cls.cache.delete("users:list")
+        cls.cache.delete_by_id(user_id)
+        cls.cache.delete_list()

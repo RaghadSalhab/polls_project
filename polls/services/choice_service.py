@@ -1,51 +1,41 @@
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from polls.caches.choice_cache import ChoiceCache
 from polls.repositories.choice_repository import ChoiceRepository
 from polls.repositories.question_repository import QuestionRepository
 from polls.schemas.choice import ChoiceSchema
-from polls.services.cache_manager import get_cache_manager
 from polls.models.database import Session
 
 class ChoiceService:
-    cache = get_cache_manager()
+    cache = ChoiceCache()
 
-    # ---------------- Cache helpers ----------------
     @staticmethod
-    def _get_from_cache(cache_key, fetch_fn, expire=None):
-        cached_data = ChoiceService.cache.get(cache_key)
-        if cached_data is not None:
-            return cached_data
+    def get_choice(choice_id: int):
+        cached = ChoiceService.cache.get_by_id(choice_id)
+        if cached:
+            return cached
 
-        data = fetch_fn()
-        if data is not None:
-            ChoiceService.cache.set(cache_key, data, expire=expire)
+        choice = ChoiceRepository.get(choice_id)
+        if not choice:
+            raise ObjectDoesNotExist("Choice not found")
+
+        data = ChoiceSchema().dump(choice)
+        ChoiceService.cache.set_by_id(choice_id, data)
         return data
 
     @staticmethod
-    def _invalidate_choice_cache(choice):
-        ChoiceService.cache.delete(f"choice:{choice.id}")
-        ChoiceService.cache.delete(f"choices:list:{choice.question.id}")
-
-    # ---------------- Choice operations ----------------
-    @staticmethod
-    def get_choice(choice_id: int):
-        return ChoiceService._get_from_cache(
-            f"choice:{choice_id}",
-            lambda: ChoiceSchema().dump(ChoiceRepository.get(choice_id))
-        )
-
-    @staticmethod
     def list_choices_for_question(question_id: int):
+        cached = ChoiceService.cache.get_list_for_question(question_id)
+        if cached:
+            return cached
+
         question = QuestionRepository.get(question_id)
         if not question:
             raise ObjectDoesNotExist("Question not found")
 
-        return ChoiceService._get_from_cache(
-            f"choices:list:{question_id}",
-            lambda: ChoiceSchema(many=True).dump(
-                ChoiceRepository.list_choices_for_question(question_id)
-            ),
-            expire=120
-        )
+        choices = ChoiceRepository.list_choices_for_question(question_id)
+        data = ChoiceSchema(many=True).dump(choices)
+        ChoiceService.cache.set_list_for_question(question_id, data, expire=120)
+        return data
 
     @staticmethod
     def create_choice(user, question_id: int, choice_text: str):
@@ -56,7 +46,7 @@ class ChoiceService:
             raise PermissionDenied("You cannot add choice to this question")
 
         choice = ChoiceRepository.add(ChoiceRepository.model(question_id=question_id, choice_text=choice_text))
-        ChoiceService.cache.delete(f"choices:list:{question_id}")
+        ChoiceService.cache.delete_list_for_question(question_id)
         return ChoiceSchema().dump(choice)
 
     @staticmethod
@@ -72,7 +62,9 @@ class ChoiceService:
         choice.choice_text = choice_text
         Session.flush()
         Session.refresh(choice)
-        ChoiceService._invalidate_choice_cache(choice)
+
+        ChoiceService.cache.delete_by_id(choice_id)
+        ChoiceService.cache.delete_list_for_question(choice.question.id)
         return ChoiceSchema().dump(choice)
 
     @staticmethod
@@ -84,7 +76,8 @@ class ChoiceService:
             raise PermissionDenied("You cannot delete this choice")
 
         ChoiceRepository.delete(choice)
-        ChoiceService._invalidate_choice_cache(choice)
+        ChoiceService.cache.delete_by_id(choice_id)
+        ChoiceService.cache.delete_list_for_question(choice.question.id)
 
     @staticmethod
     def vote(choice_id: int):
@@ -92,5 +85,6 @@ class ChoiceService:
         if not choice:
             raise ObjectDoesNotExist("Choice not found")
 
-        ChoiceService._invalidate_choice_cache(choice)
+        ChoiceService.cache.delete_by_id(choice_id)
+        ChoiceService.cache.delete_list_for_question(choice.question.id)
         return ChoiceSchema().dump(choice)
