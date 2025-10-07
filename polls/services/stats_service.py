@@ -1,36 +1,62 @@
+# polls/services/stats_service.py
 from decimal import Decimal
 from polls.repositories.stats_repository import StatsRepository
-from polls.cache_decorator import cache_response
 from polls.schemas.question import QuestionSchema
 from polls.schemas.choice import ChoiceSchema
+from polls.services.cache_manager import get_cache_manager
 
 class StatsService:
+    cache = get_cache_manager()
 
     @staticmethod
-    @cache_response(lambda: "stats:top_question", expire=300)
     def get_top_question():
+        cache_key = "stats:top_question"
+        cached_data = StatsService.cache.get(cache_key)
+        if cached_data is not None:
+            return cached_data
+
         question = StatsRepository.top_voted_question()
         if not question:
             return None
-        return QuestionSchema().dump(question)
+
+        data = QuestionSchema().dump(question)
+        StatsService.cache.set(cache_key, data)
+        return data
 
     @staticmethod
-    @cache_response(lambda question_id: f"stats:question_votes:{question_id}", expire=300)
     def get_question_votes(question_id: int):
+        cache_key = f"stats:question_votes:{question_id}"
+        cached_data = StatsService.cache.get(cache_key)
+        if cached_data is not None:
+            return cached_data
+
         votes = StatsRepository.question_votes(question_id)
-        return int(votes) if isinstance(votes, Decimal) else votes
+        votes_int = int(votes) if isinstance(votes, Decimal) else votes
+        StatsService.cache.set(cache_key, votes_int)
+        return votes_int
 
     @staticmethod
-    @cache_response(lambda: "stats:top_choice", expire=300)
     def get_top_choice():
+        cache_key = "stats:top_choice"
+        cached_data = StatsService.cache.get(cache_key)
+        if cached_data is not None:
+            return cached_data
+
         choice = StatsRepository.top_voted_choice()
         if not choice:
             return None
-        return ChoiceSchema().dump(choice)
+
+        data = ChoiceSchema().dump(choice)
+        StatsService.cache.set(cache_key, data)
+        return data
 
     @staticmethod
-    @cache_response(lambda: "stats:questions_with_votes", expire=300)
     def list_questions_with_votes():
+        cache_key = "stats:questions_with_votes"
+        cached_data = StatsService.cache.get(cache_key)
+        if cached_data is not None:
+            return cached_data
+
         results = StatsRepository.all_questions_with_votes()
         data = [
             {
@@ -39,4 +65,5 @@ class StatsService:
             }
             for q, total_votes in results
         ]
+        StatsService.cache.set(cache_key, data)
         return data
