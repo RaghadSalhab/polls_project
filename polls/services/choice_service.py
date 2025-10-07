@@ -6,7 +6,7 @@ from polls.schemas.choice import ChoiceSchema
 from polls.models.database import Session
 
 class ChoiceService:
-    cache = ChoiceCache()
+    cache = ChoiceCache(client_name="choice_cache_client")
 
     @staticmethod
     def get_choice(choice_id: int):

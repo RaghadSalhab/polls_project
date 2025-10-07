@@ -5,8 +5,9 @@ from polls.schemas.user import UserSchema
 from polls.caches.user_cache import UserCache
 
 class UserService:
-    cache = UserCache()
 
+    cache = UserCache(client_name="user_cache_client")
+    
     @classmethod
     def get_user(cls, user_id: int):
         cached_data = cls.cache.get_by_id(user_id)

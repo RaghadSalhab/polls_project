@@ -4,7 +4,7 @@ from polls.schemas.question import QuestionSchema
 from polls.caches.question_cache import QuestionCache
 
 class QuestionService:
-    cache = QuestionCache()
+    cache = QuestionCache(client_name="question_cache_client")
 
     @staticmethod
     def get_question(question_id: int):
