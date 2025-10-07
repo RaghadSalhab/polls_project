@@ -2,7 +2,7 @@ import json
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from polls.repositories.question_repository import QuestionRepository
 from polls.schemas.question import QuestionSchema
-from polls.services.redis_client import r
+from polls.cache import get_cache, set_cache, r  
 from polls.cache_decorator import cache_response
 class QuestionService:
 
@@ -43,8 +43,9 @@ class QuestionService:
             raise PermissionDenied("You cannot edit this question")
 
         question = QuestionRepository.update_question(question_id, question_text, choices)
-        r.set(f"question:{question_id}", json.dumps(QuestionSchema().dump(question), default=str), ex=300)
+        # r.set(f"question:{question_id}", json.dumps(QuestionSchema().dump(question), default=str), ex=300)
         r.delete("questions:list:all")
+        r.delete(f"question:{question_id}")
         return QuestionSchema().dump(question)
 
     @staticmethod

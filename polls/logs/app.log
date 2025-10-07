@@ -1,0 +1,267 @@
+2025-10-07 00:45:24,581 - INFO - 💾 Cache set for stats:question_votes:1 (expire=300s)
+2025-10-07 00:45:31,330 - INFO - 📦 Cache hit for stats:question_votes:1
+2025-10-07 00:45:31,331 - INFO - ✅ Returning cached result for stats:question_votes:1
+2025-10-07 00:45:32,968 - INFO - 💾 Cache set for stats:question_votes:1 (expire=300s)
+2025-10-07 00:46:30,240 - INFO - 💾 Cache set for stats:question_votes:1 (expire=300s)
+2025-10-07 00:48:34,462 - INFO - 💾 Cache set for stats:question_votes:1 (expire=300s)
+2025-10-07 00:48:54,512 - INFO - 💾 Cache set for stats:question_votes:1 (expire=300s)
+2025-10-07 00:49:02,439 - INFO - 💾 Cache set for stats:question_votes:1 (expire=300s)
+2025-10-07 00:49:54,909 - INFO - 💾 Cache set for stats:question_votes:1 (expire=300s)
+2025-10-07 00:50:01,166 - INFO - 💾 Cache set for stats:question_votes:1 (expire=300s)
+2025-10-07 00:50:02,197 - INFO - 📦 Cache hit for stats:question_votes:1
+2025-10-07 00:50:02,197 - INFO - 📦 Cache hit for stats:question_votes:1
+2025-10-07 00:50:02,197 - INFO - ✅ Returning cached result for stats:question_votes:1
+2025-10-07 00:50:18,972 - INFO - 💾 Cache set for stats:question_votes:1 (expire=300s)
+2025-10-07 00:50:19,880 - INFO - 📦 Cache hit for stats:question_votes:1
+2025-10-07 00:50:19,880 - INFO - 📦 Cache hit for stats:question_votes:1
+2025-10-07 00:50:19,880 - INFO - ✅ Returning cached result for stats:question_votes:1
+2025-10-07 00:50:56,314 - INFO - 💾 Cache set for stats:top_choice (expire=300s)
+2025-10-07 00:51:08,110 - INFO - 💾 Cache set for stats:top_choice (expire=300s)
+2025-10-07 00:53:15,195 - INFO - 💾 Cache set for stats:top_choice (expire=300s)
+2025-10-07 00:59:59,626 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 01:00:08,145 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 01:00:15,436 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 01:00:23,521 - INFO - 📦 Cache hit for question:9
+2025-10-07 01:00:23,522 - INFO - 📦 Cache hit for question:9
+2025-10-07 01:00:23,522 - INFO - ✅ Returning cached result for question:9
+2025-10-07 01:00:35,396 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 01:00:47,079 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 01:00:56,623 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 01:01:50,057 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 01:29:33,507 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 01:29:44,246 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 01:29:52,089 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 01:33:16,268 - INFO - ❌ Cache miss for question:9
+2025-10-07 01:33:16,275 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 01:33:28,876 - INFO - ❌ Cache miss for question:9
+2025-10-07 01:33:28,879 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 01:34:55,972 - INFO - ❌ Cache miss for question:9
+2025-10-07 01:34:55,976 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 01:35:15,355 - INFO - ❌ Cache miss for question:9
+2025-10-07 01:35:15,358 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 01:39:07,137 - INFO - ❌ Cache miss for question:9
+2025-10-07 01:39:07,141 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 01:40:10,594 - INFO - ❌ Cache miss for question:9
+2025-10-07 01:40:10,605 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 01:40:29,083 - INFO - ❌ Cache miss for question:9
+2025-10-07 01:40:29,087 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 01:44:38,614 - INFO - ❌ Cache miss for question:9
+2025-10-07 01:44:38,620 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 01:44:40,039 - INFO - 📦 Cache hit for question:9 (⏱️ Expires in 299s)
+2025-10-07 01:44:40,045 - INFO - 📦 Cache hit for question:9
+2025-10-07 01:44:40,045 - INFO - ✅ Returning cached result for question:9
+2025-10-07 01:44:54,394 - INFO - ❌ Cache miss for choice:72
+2025-10-07 01:44:54,398 - INFO - 💾 Cache set for choice:72 (expire=300s)
+2025-10-07 01:45:12,498 - INFO - ❌ Cache miss for choice:72
+2025-10-07 01:45:12,501 - INFO - 💾 Cache set for choice:72 (expire=300s)
+2025-10-07 01:46:39,149 - INFO - ❌ Cache miss for question:9
+2025-10-07 01:46:39,152 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 01:47:03,013 - INFO - ❌ Cache miss for question:9
+2025-10-07 01:47:03,016 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 01:47:28,609 - INFO - ❌ Cache miss for choice:72
+2025-10-07 01:47:28,611 - INFO - 💾 Cache set for choice:72 (expire=300s)
+2025-10-07 01:47:35,495 - INFO - ❌ Cache miss for choice:72
+2025-10-07 01:47:35,497 - INFO - 💾 Cache set for choice:72 (expire=300s)
+2025-10-07 01:49:08,845 - INFO - ❌ Cache miss for choice:72
+2025-10-07 01:49:08,851 - INFO - 💾 Cache set for choice:72 (expire=300s)
+2025-10-07 01:49:20,072 - INFO - 📦 Cache hit for choice:72 (⏱️ Expires in 3965s)
+2025-10-07 01:49:20,073 - INFO - 📦 Cache hit for choice:72
+2025-10-07 01:49:20,073 - INFO - ✅ Returning cached result for choice:72
+2025-10-07 01:49:25,623 - INFO - 📦 Cache hit for choice:72 (⏱️ Expires in 3959s)
+2025-10-07 01:49:25,624 - INFO - 📦 Cache hit for choice:72
+2025-10-07 01:49:25,624 - INFO - ✅ Returning cached result for choice:72
+2025-10-07 01:49:37,028 - INFO - 📦 Cache hit for choice:72 (⏱️ Expires in 3948s)
+2025-10-07 01:49:37,028 - INFO - 📦 Cache hit for choice:72
+2025-10-07 01:49:37,028 - INFO - ✅ Returning cached result for choice:72
+2025-10-07 01:50:13,226 - INFO - ❌ Cache miss for question:9
+2025-10-07 01:50:13,232 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 01:50:20,455 - INFO - ❌ Cache miss for question:9
+2025-10-07 01:50:20,457 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 01:50:49,805 - INFO - ❌ Cache miss for choices:list:1
+2025-10-07 01:50:49,808 - INFO - 💾 Cache set for choices:list:1 (expire=120s)
+2025-10-07 01:50:56,100 - INFO - 📦 Cache hit for choices:list:1 (⏱️ Expires in 114s)
+2025-10-07 01:50:56,100 - INFO - 📦 Cache hit for choices:list:1
+2025-10-07 01:50:56,100 - INFO - ✅ Returning cached result for choices:list:1
+2025-10-07 01:51:05,528 - INFO - 📦 Cache hit for choices:list:1 (⏱️ Expires in 104s)
+2025-10-07 01:51:05,528 - INFO - 📦 Cache hit for choices:list:1
+2025-10-07 01:51:05,528 - INFO - ✅ Returning cached result for choices:list:1
+2025-10-07 01:51:27,388 - INFO - ❌ Cache miss for choices:list:1
+2025-10-07 01:51:27,391 - INFO - 💾 Cache set for choices:list:1 (expire=120s)
+2025-10-07 01:51:32,024 - INFO - 📦 Cache hit for choices:list:1 (⏱️ Expires in 115s)
+2025-10-07 01:51:32,025 - INFO - 📦 Cache hit for choices:list:1
+2025-10-07 01:51:32,025 - INFO - ✅ Returning cached result for choices:list:1
+2025-10-07 01:52:23,566 - INFO - ❌ Cache miss for choices:list:1
+2025-10-07 01:52:23,569 - INFO - 💾 Cache set for choices:list:1 (expire=120s)
+2025-10-07 01:52:32,201 - INFO - ❌ Cache miss for choices:list:1
+2025-10-07 01:52:32,204 - INFO - 💾 Cache set for choices:list:1 (expire=120s)
+2025-10-07 01:52:44,156 - INFO - 📦 Cache hit for choice:72 (⏱️ Expires in 3761s)
+2025-10-07 01:52:44,156 - INFO - 📦 Cache hit for choice:72
+2025-10-07 01:52:44,156 - INFO - ✅ Returning cached result for choice:72
+2025-10-07 01:53:01,013 - INFO - ❌ Cache miss for users:list
+2025-10-07 01:53:01,015 - INFO - 💾 Cache set for users:list (expire=300s)
+2025-10-07 01:53:05,508 - INFO - ❌ Cache miss for users:list
+2025-10-07 01:53:05,510 - INFO - 💾 Cache set for users:list (expire=300s)
+2025-10-07 01:53:12,998 - INFO - ❌ Cache miss for user:2
+2025-10-07 01:53:13,001 - INFO - 💾 Cache set for user:2 (expire=300s)
+2025-10-07 01:53:16,737 - INFO - 📦 Cache hit for user:2 (⏱️ Expires in 296s)
+2025-10-07 01:53:20,751 - INFO - 📦 Cache hit for user:2 (⏱️ Expires in 292s)
+2025-10-07 01:53:27,930 - INFO - 📦 Cache hit for user:2 (⏱️ Expires in 285s)
+2025-10-07 01:53:38,504 - INFO - ❌ Cache miss for user:2
+2025-10-07 01:53:38,507 - INFO - 💾 Cache set for user:2 (expire=300s)
+2025-10-07 01:54:32,496 - INFO - ❌ Cache miss for user:2
+2025-10-07 01:54:32,499 - INFO - 💾 Cache set for user:2 (expire=300s)
+2025-10-07 01:54:39,658 - INFO - ❌ Cache miss for user:2
+2025-10-07 01:54:39,659 - INFO - 💾 Cache set for user:2 (expire=300s)
+2025-10-07 01:54:50,213 - INFO - ❌ Cache miss for user:2
+2025-10-07 01:54:50,215 - INFO - 💾 Cache set for user:2 (expire=300s)
+2025-10-07 01:55:07,410 - INFO - ❌ Cache miss for user:2
+2025-10-07 01:55:07,412 - INFO - 💾 Cache set for user:2 (expire=300s)
+2025-10-07 01:56:45,838 - INFO - ❌ Cache miss for user:2
+2025-10-07 01:56:45,841 - INFO - 💾 Cache set for user:2 (expire=300s)
+2025-10-07 01:56:50,248 - INFO - 📦 Cache hit for user:2 (⏱️ Expires in 296s)
+2025-10-07 01:56:56,522 - INFO - 📦 Cache hit for user:2 (⏱️ Expires in 289s)
+2025-10-07 01:57:01,406 - INFO - ❌ Cache miss for user:2
+2025-10-07 01:57:01,407 - INFO - 💾 Cache set for user:2 (expire=300s)
+2025-10-07 01:57:59,637 - INFO - ❌ Cache miss for user:2
+2025-10-07 01:57:59,639 - INFO - 💾 Cache set for user:2 (expire=300s)
+2025-10-07 01:59:34,292 - INFO - ❌ Cache miss for user:2
+2025-10-07 01:59:34,297 - INFO - 💾 Cache set for user:2 (expire=300s)
+2025-10-07 01:59:37,998 - INFO - ❌ Cache miss for user:2
+2025-10-07 01:59:37,999 - INFO - 💾 Cache set for user:2 (expire=300s)
+2025-10-07 01:59:43,264 - INFO - ❌ Cache miss for user:2
+2025-10-07 01:59:43,266 - INFO - 💾 Cache set for user:2 (expire=300s)
+2025-10-07 02:01:33,162 - INFO - ❌ Cache miss for user:2
+2025-10-07 02:01:33,167 - INFO - 💾 Cache set for user:2 (expire=300s)
+2025-10-07 02:01:40,814 - INFO - ❌ Cache miss for user:2
+2025-10-07 02:01:40,816 - INFO - 💾 Cache set for user:2 (expire=300s)
+2025-10-07 02:01:56,899 - INFO - 📦 Cache hit for user:2 (⏱️ Expires in 284s)
+2025-10-07 02:02:04,356 - INFO - ❌ Cache miss for user:2
+2025-10-07 02:02:04,360 - INFO - 💾 Cache set for user:2 (expire=300s)
+2025-10-07 09:05:58,614 - INFO - ❌ Cache miss for question:9
+2025-10-07 09:05:58,629 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 09:06:07,381 - INFO - ❌ Cache miss for question:9
+2025-10-07 09:06:07,385 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 09:07:24,086 - INFO - ❌ Cache miss for question:9
+2025-10-07 09:07:24,103 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 09:07:28,925 - INFO - 📦 Cache hit for question:9 (⏱️ Expires in 295s)
+2025-10-07 09:07:28,929 - INFO - 📦 Cache hit for question:9
+2025-10-07 09:07:28,930 - INFO - ✅ Returning cached result for question:9
+2025-10-07 09:07:34,144 - INFO - ❌ Cache miss for question:9
+2025-10-07 09:07:34,150 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 09:07:40,727 - INFO - ❌ Cache miss for question:9
+2025-10-07 09:07:40,732 - INFO - 💾 Cache set for question:9 (expire=300s)
+2025-10-07 09:07:53,204 - INFO - 📦 Cache hit for question:9 (⏱️ Expires in 3963s)
+2025-10-07 09:07:53,204 - INFO - 📦 Cache hit for question:9
+2025-10-07 09:07:53,206 - INFO - ✅ Returning cached result for question:9
+2025-10-07 09:08:05,005 - INFO - 📦 Cache hit for question:9 (⏱️ Expires in 3952s)
+2025-10-07 09:08:05,025 - INFO - 📦 Cache hit for question:9
+2025-10-07 09:08:05,026 - INFO - ✅ Returning cached result for question:9
+2025-10-07 09:08:15,286 - INFO - 📦 Cache hit for question:9 (⏱️ Expires in 3941s)
+2025-10-07 09:08:15,291 - INFO - 📦 Cache hit for question:9
+2025-10-07 09:08:15,296 - INFO - ✅ Returning cached result for question:9
+2025-10-07 09:09:18,885 - INFO - 📦 Cache hit for question:9 (⏱️ Expires in 3878s)
+2025-10-07 09:09:18,887 - INFO - 📦 Cache hit for question:9
+2025-10-07 09:09:18,888 - INFO - ✅ Returning cached result for question:9
+2025-10-07 09:10:21,244 - INFO - ❌ Cache miss for question:10
+2025-10-07 09:10:21,249 - INFO - 💾 Cache set for question:10 (expire=300s)
+2025-10-07 09:10:31,017 - INFO - ❌ Cache miss for question:10
+2025-10-07 09:10:31,038 - INFO - 💾 Cache set for question:10 (expire=300s)
+2025-10-07 09:10:36,514 - INFO - 📦 Cache hit for question:10 (⏱️ Expires in 3970s)
+2025-10-07 09:10:36,516 - INFO - 📦 Cache hit for question:10
+2025-10-07 09:10:36,516 - INFO - ✅ Returning cached result for question:10
+2025-10-07 09:13:05,414 - INFO - ❌ Cache miss for question:14
+2025-10-07 09:13:05,421 - INFO - 💾 Cache set for question:14 (expire=300s)
+2025-10-07 09:13:13,547 - INFO - ❌ Cache miss for question:14
+2025-10-07 09:13:13,552 - INFO - 💾 Cache set for question:14 (expire=300s)
+2025-10-07 09:13:19,152 - INFO - ❌ Cache miss for question:14
+2025-10-07 09:13:19,157 - INFO - 💾 Cache set for question:14 (expire=300s)
+2025-10-07 09:13:26,446 - INFO - ❌ Cache miss for question:14
+2025-10-07 09:13:26,452 - INFO - 💾 Cache set for question:14 (expire=300s)
+2025-10-07 09:14:01,422 - INFO - ❌ Cache miss for question:14
+2025-10-07 09:14:01,430 - INFO - 💾 Cache set for question:14 (expire=300s)
+2025-10-07 09:14:07,063 - INFO - ❌ Cache miss for question:14
+2025-10-07 09:14:07,067 - INFO - 💾 Cache set for question:14 (expire=300s)
+2025-10-07 09:14:37,317 - INFO - ❌ Cache miss for question:14
+2025-10-07 09:14:37,321 - INFO - 💾 Cache set for question:14 (expire=300s)
+2025-10-07 09:14:43,210 - INFO - ❌ Cache miss for question:14
+2025-10-07 09:14:43,215 - INFO - 💾 Cache set for question:14 (expire=300s)
+2025-10-07 09:14:55,813 - INFO - ❌ Cache miss for question:14
+2025-10-07 09:14:55,832 - INFO - 💾 Cache set for question:14 (expire=300s)
+2025-10-07 09:15:00,325 - INFO - ❌ Cache miss for question:14
+2025-10-07 09:15:00,330 - INFO - 💾 Cache set for question:14 (expire=300s)
+2025-10-07 09:15:04,702 - INFO - ❌ Cache miss for question:14
+2025-10-07 09:15:04,706 - INFO - 💾 Cache set for question:14 (expire=300s)
+2025-10-07 09:15:13,158 - INFO - ❌ Cache miss for question:11
+2025-10-07 09:15:13,163 - INFO - 💾 Cache set for question:11 (expire=300s)
+2025-10-07 09:15:17,777 - INFO - ❌ Cache miss for question:11
+2025-10-07 09:15:17,783 - INFO - 💾 Cache set for question:11 (expire=300s)
+2025-10-07 09:15:24,379 - INFO - 📦 Cache hit for question:11 (⏱️ Expires in 293s)
+2025-10-07 09:15:24,380 - INFO - 📦 Cache hit for question:11
+2025-10-07 09:15:24,380 - INFO - ✅ Returning cached result for question:11
+2025-10-07 09:15:33,085 - INFO - ❌ Cache miss for question:11
+2025-10-07 09:15:33,090 - INFO - 💾 Cache set for question:11 (expire=300s)
+2025-10-07 09:15:51,486 - INFO - ❌ Cache miss for question:11
+2025-10-07 09:15:51,492 - INFO - 💾 Cache set for question:11 (expire=300s)
+2025-10-07 09:15:56,390 - INFO - 📦 Cache hit for question:11 (⏱️ Expires in 295s)
+2025-10-07 09:15:56,390 - INFO - 📦 Cache hit for question:11
+2025-10-07 09:15:56,391 - INFO - ✅ Returning cached result for question:11
+2025-10-07 09:16:05,580 - INFO - ❌ Cache miss for question:11
+2025-10-07 09:16:05,587 - INFO - 💾 Cache set for question:11 (expire=300s)
+2025-10-07 09:21:04,580 - INFO - ❌ Cache miss for choices:list:1
+2025-10-07 09:21:04,591 - INFO - 💾 Cache set for choices:list:1 (expire=120s)
+2025-10-07 09:21:11,654 - INFO - 📦 Cache hit for choices:list:1 (⏱️ Expires in 113s)
+2025-10-07 09:21:11,656 - INFO - 📦 Cache hit for choices:list:1
+2025-10-07 09:21:11,656 - INFO - ✅ Returning cached result for choices:list:1
+2025-10-07 09:21:31,888 - INFO - ❌ Cache miss for choices:list:1
+2025-10-07 09:21:31,895 - INFO - 💾 Cache set for choices:list:1 (expire=120s)
+2025-10-07 09:21:36,279 - INFO - 📦 Cache hit for choices:list:1 (⏱️ Expires in 116s)
+2025-10-07 09:21:36,279 - INFO - 📦 Cache hit for choices:list:1
+2025-10-07 09:21:36,279 - INFO - ✅ Returning cached result for choices:list:1
+2025-10-07 09:21:47,315 - INFO - ❌ Cache miss for choices:list:1
+2025-10-07 09:21:47,319 - INFO - 💾 Cache set for choices:list:1 (expire=120s)
+2025-10-07 09:22:27,731 - INFO - ❌ Cache miss for choice:72
+2025-10-07 09:22:27,761 - INFO - 💾 Cache set for choice:72 (expire=300s)
+2025-10-07 09:22:34,555 - INFO - 📦 Cache hit for choice:72 (⏱️ Expires in 3969s)
+2025-10-07 09:22:34,556 - INFO - 📦 Cache hit for choice:72
+2025-10-07 09:22:34,556 - INFO - ✅ Returning cached result for choice:72
+2025-10-07 09:22:45,609 - INFO - 📦 Cache hit for choice:72 (⏱️ Expires in 3958s)
+2025-10-07 09:22:45,612 - INFO - 📦 Cache hit for choice:72
+2025-10-07 09:22:45,614 - INFO - ✅ Returning cached result for choice:72
+2025-10-07 09:24:01,801 - INFO - ❌ Cache miss for choice:72
+2025-10-07 09:24:01,821 - INFO - 💾 Cache set for choice:72 (expire=300s)
+2025-10-07 09:24:07,658 - INFO - 📦 Cache hit for choice:72 (⏱️ Expires in 294s)
+2025-10-07 09:24:07,660 - INFO - 📦 Cache hit for choice:72
+2025-10-07 09:24:07,661 - INFO - ✅ Returning cached result for choice:72
+2025-10-07 09:24:16,756 - INFO - ❌ Cache miss for choice:72
+2025-10-07 09:24:16,761 - INFO - 💾 Cache set for choice:72 (expire=300s)
+2025-10-07 09:24:21,290 - INFO - 📦 Cache hit for choice:72 (⏱️ Expires in 295s)
+2025-10-07 09:24:21,290 - INFO - 📦 Cache hit for choice:72
+2025-10-07 09:24:21,291 - INFO - ✅ Returning cached result for choice:72
+2025-10-07 09:24:24,995 - INFO - ❌ Cache miss for choice:72
+2025-10-07 09:24:24,998 - INFO - 💾 Cache set for choice:72 (expire=300s)
+2025-10-07 09:24:28,837 - INFO - ❌ Cache miss for choice:72
+2025-10-07 09:24:28,840 - INFO - 💾 Cache set for choice:72 (expire=300s)
+2025-10-07 09:24:34,903 - INFO - ❌ Cache miss for choice:72
+2025-10-07 09:24:34,906 - INFO - 💾 Cache set for choice:72 (expire=300s)
+2025-10-07 09:24:40,780 - INFO - ❌ Cache miss for choice:72
+2025-10-07 09:24:40,787 - INFO - 💾 Cache set for choice:72 (expire=300s)
+2025-10-07 09:24:44,587 - INFO - ❌ Cache miss for choice:72
+2025-10-07 09:24:44,590 - INFO - 💾 Cache set for choice:72 (expire=300s)
+2025-10-07 09:24:57,449 - INFO - ❌ Cache miss for choice:72
+2025-10-07 09:24:57,452 - INFO - 💾 Cache set for choice:72 (expire=300s)
+2025-10-07 09:25:07,403 - INFO - ❌ Cache miss for choice:72
+2025-10-07 09:25:07,409 - INFO - 💾 Cache set for choice:72 (expire=300s)
+2025-10-07 09:25:11,539 - INFO - ❌ Cache miss for choice:72
+2025-10-07 09:25:11,543 - INFO - 💾 Cache set for choice:72 (expire=300s)
+2025-10-07 09:30:05,577 - INFO - ❌ Cache miss for choice:72
+2025-10-07 09:30:05,581 - INFO - 💾 Cache set for choice:72 (expire=300s)
+2025-10-07 09:30:10,594 - INFO - 📦 Cache hit for choice:72 (⏱️ Expires in 295s)
+2025-10-07 09:30:10,594 - INFO - 📦 Cache hit for choice:72
+2025-10-07 09:30:10,595 - INFO - ✅ Returning cached result for choice:72
+2025-10-07 09:30:16,087 - INFO - 📦 Cache hit for choice:72 (⏱️ Expires in 289s)
+2025-10-07 09:30:16,087 - INFO - 📦 Cache hit for choice:72
+2025-10-07 09:30:16,088 - INFO - ✅ Returning cached result for choice:72
+2025-10-07 09:31:52,002 - INFO - ❌ Cache miss for question:11
+2025-10-07 09:31:52,008 - INFO - 💾 Cache set for question:11 (expire=300s)
+2025-10-07 09:32:00,049 - INFO - ❌ Cache miss for question:11
+2025-10-07 09:32:00,058 - INFO - 💾 Cache set for question:11 (expire=300s)

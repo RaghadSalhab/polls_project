@@ -3,8 +3,7 @@ from polls.repositories.question_repository import QuestionRepository
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from polls.schemas.choice import ChoiceSchema
 from polls.cache_decorator import cache_response
-from polls.services.redis_client import r
-
+from polls.cache import get_cache, set_cache, r  
 class ChoiceService:
 
     @staticmethod
@@ -32,6 +31,7 @@ class ChoiceService:
             raise ObjectDoesNotExist("Question not found")
         if question.created_by_id != user.id:
             raise PermissionDenied("You cannot add choice to this question")
+
         choice = ChoiceRepository.create_choice(question_id, choice_text)
 
         r.delete(f"choices:list:{question_id}")
@@ -46,6 +46,7 @@ class ChoiceService:
             raise PermissionDenied("You cannot edit this choice")
         if choice.votes > 0:
             raise PermissionDenied("Cannot edit a choice after votes")
+
         updated_choice = ChoiceRepository.update_choice(choice_id, choice_text)
 
         r.delete(f"choice:{choice_id}")
@@ -59,6 +60,7 @@ class ChoiceService:
             raise ObjectDoesNotExist("Choice not found")
         if choice.question.created_by_id != user.id:
             raise PermissionDenied("You cannot delete this choice")
+
         ChoiceRepository.delete_choice(choice_id)
 
         r.delete(f"choice:{choice_id}")
@@ -69,6 +71,7 @@ class ChoiceService:
         choice = ChoiceRepository.get_choice(choice_id)
         if not choice:
             raise ObjectDoesNotExist("Choice not found")
+
         choice.votes += 1
         from polls.models.database import Session
         Session.flush()

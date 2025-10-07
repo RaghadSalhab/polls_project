@@ -114,6 +114,7 @@ DATABASES = {
 }
 
 
+APPEND_SLASH = True
 
 
 

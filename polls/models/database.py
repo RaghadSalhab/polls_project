@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base, scoped_session
 
 DATABASE_URL = "mysql+pymysql://root:1234@127.0.0.1:3306/polls_db"
 
-engine = create_engine(DATABASE_URL, echo=True)
+engine = create_engine(DATABASE_URL, echo=False)
 SessionFactory = sessionmaker(bind=engine, expire_on_commit=False)
 Session = scoped_session(SessionFactory,scopefunc=get_current_request)  
 Base = declarative_base()
