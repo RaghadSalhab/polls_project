@@ -1,58 +1,48 @@
 from sqlalchemy.orm import joinedload
+from polls.models.choice import Choice
 from polls.models.database import Session
 from polls.models.question import Question
-from polls.models.choice import Choice
+from polls.repositories.base_repository import BaseRepository
 
-class QuestionRepository:
 
-    @staticmethod
-    def list_questions(search: str = None):
-        query = Session.query(Question).options(joinedload(Question.choices))
+class QuestionRepository(BaseRepository):
+    model = Question
+
+    @classmethod
+    def list_questions(cls, search: str = None):
+        query = Session.query(cls.model).options(joinedload(cls.model.choices))
         if search:
-            query = query.filter(Question.question_text.ilike(f"%{search}%"))
+            query = query.filter(cls.model.question_text.ilike(f"%{search}%"))
         return query.all()
 
-    @staticmethod
-    def list_questions_for_user(user_id: int):
-        questions = Session.query(Question)\
-                           .filter(Question.created_by_id == user_id)\
-                           .all()
+    @classmethod
+    def list_questions_for_user(cls, user_id: int):
+        questions = Session.query(cls.model).filter(cls.model.created_by_id == user_id).all()
         print(f"Found {len(questions)} questions for user {user_id}")
         return questions
 
-    @staticmethod
-    def get_question(question_id: int):
-        return Session.query(Question)\
-                      .options(joinedload(Question.created_by), joinedload(Question.choices))\
-                      .filter(Question.id == question_id)\
-                      .first()
-
-    @staticmethod
-    def create_question(user_id: int, question_text: str, choices: list[str] = None):
-        question = Question(created_by_id=user_id, question_text=question_text)
-        Session.add(question)
-        Session.flush()  
+    @classmethod
+    def create_question(cls, user_id: int, question_text: str, choices: list[str] = None):
+        question = cls.model(created_by_id=user_id, question_text=question_text)
+        cls.add(question, commit=False)
 
         if choices:
             for choice_text in choices:
                 choice = Choice(question_id=question.id, choice_text=choice_text, votes=0)
                 Session.add(choice)
 
-        Session.commit()
+        cls.commit()
         Session.refresh(question)
         return question
 
-    @staticmethod
-    def update_question(question_id: int, question_text: str, choices: list[dict] = None):
-        question = Session.query(Question)\
-                          .options(joinedload(Question.choices))\
-                          .filter(Question.id == question_id)\
-                          .first()
+    @classmethod
+    def update_question(cls, question_id: int, question_text: str, choices: list[dict] = None):
+        question = cls.get(question_id)
         if not question:
             return None
 
         question.question_text = question_text
-        if choices is not None:
+        if choices:
             for choice_data in choices:
                 choice_id = choice_data.get("id")
                 choice_text = choice_data.get("choice_text")
@@ -64,13 +54,10 @@ class QuestionRepository:
                     new_choice = Choice(question_id=question.id, choice_text=choice_text, votes=0)
                     Session.add(new_choice)
 
-        Session.commit()
+        cls.commit()
         Session.refresh(question)
         return question
 
-    @staticmethod
-    def delete_question(question_id: int):
-        question = Session.query(Question).filter(Question.id == question_id).first()
-        if question:
-            Session.delete(question)
-            Session.commit()
+    @classmethod
+    def delete_question(cls, question_id: int):
+        return cls.delete_by_id(question_id, commit=True)

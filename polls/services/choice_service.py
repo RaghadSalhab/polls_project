@@ -1,7 +1,6 @@
-# polls/services/choice_service.py
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from polls.repositories.choice_repository import ChoiceRepository
 from polls.repositories.question_repository import QuestionRepository
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from polls.schemas.choice import ChoiceSchema
 from polls.services.cache_manager import get_cache_manager
 from polls.models.database import Session
@@ -9,53 +8,60 @@ from polls.models.database import Session
 class ChoiceService:
     cache = get_cache_manager()
 
+    # ---------------- Cache helpers ----------------
     @staticmethod
-    def get_choice(choice_id: int):
-        cache_key = f"choice:{choice_id}"
+    def _get_from_cache(cache_key, fetch_fn, expire=None):
         cached_data = ChoiceService.cache.get(cache_key)
         if cached_data is not None:
             return cached_data
 
-        choice = ChoiceRepository.get_choice(choice_id)
-        if not choice:
-            raise ObjectDoesNotExist("Choice not found")
-
-        data = ChoiceSchema().dump(choice)
-        ChoiceService.cache.set(cache_key, data)
+        data = fetch_fn()
+        if data is not None:
+            ChoiceService.cache.set(cache_key, data, expire=expire)
         return data
+
+    @staticmethod
+    def _invalidate_choice_cache(choice):
+        ChoiceService.cache.delete(f"choice:{choice.id}")
+        ChoiceService.cache.delete(f"choices:list:{choice.question.id}")
+
+    # ---------------- Choice operations ----------------
+    @staticmethod
+    def get_choice(choice_id: int):
+        return ChoiceService._get_from_cache(
+            f"choice:{choice_id}",
+            lambda: ChoiceSchema().dump(ChoiceRepository.get(choice_id))
+        )
 
     @staticmethod
     def list_choices_for_question(question_id: int):
-        question = QuestionRepository.get_question(question_id)
+        question = QuestionRepository.get(question_id)
         if not question:
             raise ObjectDoesNotExist("Question not found")
 
-        cache_key = f"choices:list:{question_id}"
-        cached_data = ChoiceService.cache.get(cache_key)
-        if cached_data is not None:
-            return cached_data
-
-        choices = ChoiceRepository.list_choices_for_question(question_id)
-        data = ChoiceSchema(many=True).dump(choices)
-        ChoiceService.cache.set(cache_key, data, expire=120)
-        return data
+        return ChoiceService._get_from_cache(
+            f"choices:list:{question_id}",
+            lambda: ChoiceSchema(many=True).dump(
+                ChoiceRepository.list_choices_for_question(question_id)
+            ),
+            expire=120
+        )
 
     @staticmethod
     def create_choice(user, question_id: int, choice_text: str):
-        question = QuestionRepository.get_question(question_id)
+        question = QuestionRepository.get(question_id)
         if not question:
             raise ObjectDoesNotExist("Question not found")
         if question.created_by_id != user.id:
             raise PermissionDenied("You cannot add choice to this question")
 
-        choice = ChoiceRepository.create_choice(question_id, choice_text)
-
+        choice = ChoiceRepository.add(ChoiceRepository.model(question_id=question_id, choice_text=choice_text))
         ChoiceService.cache.delete(f"choices:list:{question_id}")
         return ChoiceSchema().dump(choice)
 
     @staticmethod
     def update_choice(user, choice_id: int, choice_text: str):
-        choice = ChoiceRepository.get_choice(choice_id)
+        choice = ChoiceRepository.get(choice_id)
         if not choice:
             raise ObjectDoesNotExist("Choice not found")
         if choice.question.created_by_id != user.id:
@@ -63,35 +69,28 @@ class ChoiceService:
         if choice.votes > 0:
             raise PermissionDenied("Cannot edit a choice after votes")
 
-        updated_choice = ChoiceRepository.update_choice(choice_id, choice_text)
-
-        ChoiceService.cache.delete(f"choice:{choice_id}")
-        ChoiceService.cache.delete(f"choices:list:{choice.question.id}")
-        return ChoiceSchema().dump(updated_choice)
+        choice.choice_text = choice_text
+        Session.flush()
+        Session.refresh(choice)
+        ChoiceService._invalidate_choice_cache(choice)
+        return ChoiceSchema().dump(choice)
 
     @staticmethod
     def delete_choice(user, choice_id: int):
-        choice = ChoiceRepository.get_choice(choice_id)
+        choice = ChoiceRepository.get(choice_id)
         if not choice:
             raise ObjectDoesNotExist("Choice not found")
         if choice.question.created_by_id != user.id:
             raise PermissionDenied("You cannot delete this choice")
 
-        ChoiceRepository.delete_choice(choice_id)
-
-        ChoiceService.cache.delete(f"choice:{choice_id}")
-        ChoiceService.cache.delete(f"choices:list:{choice.question.id}")
+        ChoiceRepository.delete(choice)
+        ChoiceService._invalidate_choice_cache(choice)
 
     @staticmethod
     def vote(choice_id: int):
-        choice = ChoiceRepository.get_choice(choice_id)
+        choice = ChoiceRepository.vote(choice_id)
         if not choice:
             raise ObjectDoesNotExist("Choice not found")
 
-        choice.votes += 1
-        Session.flush()
-        Session.refresh(choice)
-
-        ChoiceService.cache.delete(f"choice:{choice_id}")
-        ChoiceService.cache.delete(f"choices:list:{choice.question.id}")
+        ChoiceService._invalidate_choice_cache(choice)
         return ChoiceSchema().dump(choice)
