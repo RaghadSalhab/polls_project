@@ -11,7 +11,7 @@ class BaseCache:
             print(f"❌ Cache miss for {key}")
             return None
         try:
-            value = json.loads(value)  # تحويل من string لـ dict/list
+            value = json.loads(value)
         except json.JSONDecodeError:
             pass
         print(f"✅ Cache hit for {key}")
@@ -19,7 +19,7 @@ class BaseCache:
 
     def set(self, key, value, expire=None):
         if isinstance(value, (dict, list)):
-            value = json.dumps(value)  # تحويل dict/list لـ string
+            value = json.dumps(value) 
         self.client.set(key, value, ex=expire)
         print(f"✅ Cache set for {key}")
 
