@@ -1,6 +1,7 @@
 from django.contrib.auth.hashers import make_password
 from polls.models.user import User
 from polls.repositories.base_repository import BaseRepository
+from polls.models.database import Session
 
 class UserRepository(BaseRepository):
     model = User  
@@ -29,3 +30,7 @@ class UserRepository(BaseRepository):
         if commit:
             cls.commit()
         return user
+    
+    @classmethod
+    def get_by_username(cls, username: str):
+            return Session.query(cls.model).filter_by(username=username).first()

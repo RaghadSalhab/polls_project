@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-
+from rest_framework.views import APIView
 from polls.services.user_service import UserService
 from polls.services.question_service import QuestionService
 
@@ -58,29 +58,38 @@ class UserQuestionsViewSet(viewsets.ViewSet):
             return Response({"detail": "Not found"}, status=404)
         return Response(question)
 
-
-
-    
 class UserRegisterView(generics.CreateAPIView):
     permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
-
         schema = UserSchema()
+
         try:
-            user = schema.load(request.data) 
+            validated_data = schema.load(request.data)
         except ValidationError as e:
-            return Response({"errors": e.messages}, status=400)
+            return Response({"errors": e.messages}, status=status.HTTP_400_BAD_REQUEST)
 
         user = UserService.create_user(
-            user.username,
-            user.email,
-            user.password
+            username=validated_data.username,
+            email=validated_data.email,
+            password=validated_data.password
         )
 
         refresh = RefreshToken.for_user(user)
+
         return Response({
-            "user": schema.dump(user),
+            "user": schema.dump(user), 
             "refresh": str(refresh),
             "access": str(refresh.access_token),
         }, status=status.HTTP_201_CREATED)
+    
+class UserProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        profile = UserService.get_profile(request.user.id)
+        return Response(profile)
+
+    def put(self, request):
+        updated_profile = UserService.update_profile(request.user, **request.data)
+        return Response(updated_profile)

@@ -11,7 +11,7 @@ class BaseCache:
         else:
             self.client = redis.Redis(
                 host='localhost',
-                port=6379,
+                port=6380,
                 db=0,
                 client_name=client_name
             )

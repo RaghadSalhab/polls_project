@@ -4,7 +4,7 @@ from polls.views.choice_views import ChoiceViewSet
 from polls.views.stats_views import StatsViewSet
 from rest_framework_nested import routers
 from polls.views.question_views import QuestionViewSet
-from polls.views.user_views import UserViewSet, UserQuestionsViewSet
+from polls.views.user_views import UserProfileView, UserViewSet, UserQuestionsViewSet
 
 router = routers.DefaultRouter()
 router.register(r'questions', QuestionViewSet, basename='questions')
@@ -23,4 +23,6 @@ urlpatterns = [
     path('', include(router.urls)),
     path('', include(choices_router.urls)),
     path('', include(user_questions_router.urls)),
+    path('profile/', UserProfileView.as_view(), name='user-profile'),
+
 ]

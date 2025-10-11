@@ -115,6 +115,12 @@ DATABASES = {
 
 
 APPEND_SLASH = True
+from ddtrace import tracer
+
+# Tags عامة للمشروع (اختياري)
+tracer.set_tags({
+    "project": "polls_app"
+})
 
 
 
