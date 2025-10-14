@@ -6,7 +6,7 @@ from polls.caches.stats_cache import StatsCache
 from ddtrace import tracer
 
 class StatsService:
-    cache = StatsCache(client_name="stats_cache_client")
+    cache = StatsCache()
 
     @staticmethod
     def get_top_question():

@@ -1,3 +1,4 @@
+
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -11,7 +12,10 @@ class QuestionViewSet(viewsets.ViewSet):
 
     def list(self, request):
         search = request.query_params.get("search")
-        questions = QuestionService.list_questions(search)
+        if search:
+            questions = QuestionService.search_questions(search)  
+        else:
+            questions = QuestionService.list_questions()
         return Response(questions)
 
     def retrieve(self, request, pk=None):
@@ -41,3 +45,5 @@ class QuestionViewSet(viewsets.ViewSet):
         choice_id = request.data.get("choice_id")
         choice = ChoiceService.vote(choice_id)
         return Response(ChoiceSchema().dump(choice))
+
+# 
