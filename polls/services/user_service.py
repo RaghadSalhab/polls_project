@@ -7,7 +7,7 @@ from ddtrace import tracer
 
 class UserService:
 
-    cache = UserCache(client_name="user_cache_client")
+    cache = UserCache()
     
     @classmethod
     def get_user(cls, user_id: int):

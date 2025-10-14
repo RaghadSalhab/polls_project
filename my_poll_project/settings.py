@@ -102,22 +102,37 @@ WSGI_APPLICATION = 'my_poll_project.wsgi.application'
 #        'NAME': BASE_DIR / 'db.sqlite3',
 #    }
 #}
+
+#connection to mysql database
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'polls_db',
+#         'USER': 'root',
+#         'PASSWORD': '1234',
+#         'HOST': '127.0.0.1',
+#         'PORT': '3306',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'polls_db',
-        'USER': 'root',
-        'PASSWORD': '1234',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'polls_db',      
+        'USER': 'postgres',         
+        'PASSWORD': '1234',         
+        'HOST': 'localhost',        
+        'PORT': '5432',            
     }
 }
-
+import environ
+import os
+env = environ.Env()
+environ.Env.read_env(env_file=os.path.join(BASE_DIR, '.env'))
 
 APPEND_SLASH = True
 from ddtrace import tracer
 
-# Tags عامة للمشروع (اختياري)
 tracer.set_tags({
     "project": "polls_app"
 })

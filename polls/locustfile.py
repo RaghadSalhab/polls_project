@@ -52,3 +52,26 @@ class PollsUser(HttpUser):
             json={"text": "What is your favorite color?"},
             headers=headers
         )
+
+# from locust import HttpUser, task, between
+
+# class PollsUser(HttpUser):
+#     wait_time = between(1, 3)
+#     token = None
+
+#     def on_start(self):
+#         response = self.client.post(
+#             "/api/token/",
+#             json={"username": "rwrwz", "password": "123456789"}
+#         )
+#         self.token = response.json()["access"]
+
+#     @task
+#     def get_questions(self):
+#         headers = {"Authorization": f"Bearer {self.token}"}
+#         self.client.get("/api/questions/", headers=headers)
+
+#     @task
+#     def get_choices(self):
+#         headers = {"Authorization": f"Bearer {self.token}"}
+#         self.client.get("/api/questions/1/choices/", headers=headers)
