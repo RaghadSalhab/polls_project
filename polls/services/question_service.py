@@ -5,11 +5,14 @@ from polls.schemas.question import QuestionSchema
 from polls.caches.question_cache import QuestionCache
 from polls.elasticsearch.log_elasticsearch import LogElasticsearch
 from ddtrace import tracer
+from polls.aws.sns_client import SNSClient  # ⬅️ أضف هذا في أعلى الملف
 
 class QuestionService:
     cache = QuestionCache()
     es = QuestionElasticsearch()
     log_es = LogElasticsearch()  # Init log handler
+    sns_client = SNSClient()  # ⬅️ نجهز SNS client هنا
+
 
     @staticmethod
     def search_questions(keyword: str):
@@ -97,6 +100,21 @@ class QuestionService:
             )
             return data
 
+    # @staticmethod
+    # def create_question(user, question_text: str, choices: list[str] = None):
+    #     with tracer.trace("question_service.create_question"):
+    #         question = QuestionRepository.create_question(user.id, question_text, choices)
+    #         QuestionService.cache.delete_list("all")
+    #         QuestionService.es.index_question(question)
+    #         QuestionService.log_es.log_event(
+    #             level="INFO",
+    #             action="CREATE",
+    #             object_type="QUESTION",
+    #             object_id=question.id,
+    #             message=f"User {user.username} created question",
+    #             details={"question_text": question_text}
+    #         )
+    #         return QuestionSchema().dump(question)
     @staticmethod
     def create_question(user, question_text: str, choices: list[str] = None):
         with tracer.trace("question_service.create_question"):
@@ -111,8 +129,20 @@ class QuestionService:
                 message=f"User {user.username} created question",
                 details={"question_text": question_text}
             )
-            return QuestionSchema().dump(question)
 
+            QuestionService.sns_client.publish(
+                topic_arn="arn:aws:sns:us-east-1:000000000000:QuestionEvents",
+                message={
+                    "event": "QUESTION_CREATED",
+                    "question_id": question.id,
+                    "user_id": user.id,
+                    "username": user.username,
+                    "question_text": question_text
+                }
+            )
+
+            return QuestionSchema().dump(question)
+        
     @staticmethod
     def update_question(user, question_id: int, question_text: str, choices: list[dict] = None):
         with tracer.trace("question_service.update_question"):

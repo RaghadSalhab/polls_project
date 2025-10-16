@@ -28,7 +28,6 @@ class UserCache(BaseCache):
         key = f"{self.name}:list"
         self.delete(key)
 
-
     def get_profile(self, user_id: int):
         key = f"{self.name}:{user_id}:profile"
         return self.get(key)

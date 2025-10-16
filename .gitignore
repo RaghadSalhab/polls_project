@@ -3,7 +3,5 @@ polls/__pycache__/
 __pycache__/
 *.pyc
 .dockerignore
-docker-compose.yml
-Dockerfile
 *.pyo
 .env
