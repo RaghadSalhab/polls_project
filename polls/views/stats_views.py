@@ -26,5 +26,6 @@ class StatsViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=["get"])
     def questions_with_votes(self, request):
+        
         results = StatsService.list_questions_with_votes()
         return Response(results)

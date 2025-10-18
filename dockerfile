@@ -1,13 +1,15 @@
 
-FROM python:3.13-slim
+FROM python:3.11-slim
 
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
     build-essential \
     default-libmysqlclient-dev \
+    libpq-dev \
     libssl-dev \
     libffi-dev \
+    curl \
     pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
@@ -17,4 +19,4 @@ RUN pip install -r requirements.txt
 
 COPY . /app
 
-CMD ["sh", "-c", "python polls/aws/setup_localstack.py && python -m polls.aws.sqs_listener"]
+CMD ["sh", "-c", "python wait_for_db.py && python -m polls.messaging.messaging_setup && python -m polls.messaging.consumers.consumer_manager & python manage.py runserver 0.0.0.0:8000"]

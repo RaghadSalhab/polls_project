@@ -39,6 +39,6 @@ class StatsRepository:
             )
             .outerjoin(Choice, Choice.question_id == Question.id)
             .group_by(Question.id)
-            .order_by(func.desc("total_votes"))
+            .order_by(func.coalesce(func.sum(Choice.votes), 0).desc())
             .all()
         )

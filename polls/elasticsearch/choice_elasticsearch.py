@@ -33,7 +33,9 @@ class ChoiceElasticsearch:
         self.es.update(
             index=self.INDEX,
             id=choice_id,
-            doc=updated_data
+            body={
+                "doc": updated_data,
+            }
         )
         self.log_es.log_event(
             level="INFO",
@@ -43,6 +45,7 @@ class ChoiceElasticsearch:
             message=f"Updated choice",
             details=updated_data
         )
+
 
     def delete_choice(self, choice_id):
         self.es.delete(index=self.INDEX, id=choice_id, ignore=[404])

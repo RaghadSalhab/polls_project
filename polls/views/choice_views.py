@@ -31,7 +31,7 @@ class ChoiceViewSet(viewsets.ViewSet):
     def create(self, request, question_pk=None):
         choice_text = request.data.get("choice_text")
         try:
-            choice = ChoiceService.create_choice(request.user, question_pk, choice_text)
+            choice = ChoiceService.create_choice(request.user.id, question_pk, choice_text)
             return Response(choice, status=status.HTTP_201_CREATED)
         except (ObjectDoesNotExist, PermissionDenied) as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -39,7 +39,7 @@ class ChoiceViewSet(viewsets.ViewSet):
     def update(self, request, pk=None, question_pk=None):
         choice_text = request.data.get("choice_text")
         try:
-            choice = ChoiceService.update_choice(request.user, pk, choice_text)
+            choice = ChoiceService.update_choice(request.user.id, pk, choice_text)
             return Response(choice)
         except (ObjectDoesNotExist, PermissionDenied) as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)

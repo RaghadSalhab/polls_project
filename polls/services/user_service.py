@@ -3,12 +3,14 @@ from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from polls.repositories.user_repository import UserRepository
 from polls.schemas.user import UserSchema
 from polls.caches.user_cache import UserCache
+from polls.messaging.clients import sns  
 from ddtrace import tracer
-
+import json
 class UserService:
 
     cache = UserCache()
-    
+    SNS_TOPIC_ARN = "arn:aws:sns:us-east-1:000000000000:user-topic"
+
     @classmethod
     def get_user(cls, user_id: int):
         with tracer.trace("user_service.get_user"):
@@ -45,6 +47,20 @@ class UserService:
             user = UserRepository.create_user(username, email, password)
 
             cls.cache.delete_list()
+
+            sns.publish(
+                TopicArn=cls.SNS_TOPIC_ARN,
+                Message=json.dumps({
+                    "event": "USER_CREATED",
+                    "user_id": user.id,
+                    "username": user.username,
+                    "email": user.email
+                }),
+                MessageAttributes={
+                    "event_type": {"DataType": "String", "StringValue": "USER_CREATED"}
+                }
+            )            
+        
             return user
         
     @classmethod
@@ -61,6 +77,18 @@ class UserService:
 
             cls.cache.set_by_id(user_id, data, expire=300)
             cls.cache.delete_list()
+
+            sns.publish(
+                TopicArn=cls.SNS_TOPIC_ARN,
+                Message=json.dumps({
+                    "event": "USER_UPDATED",
+                    "user_id": user.id,
+                    "username": user.username
+                }),
+                MessageAttributes={
+                    "event_type": {"DataType": "String", "StringValue": "USER_UPDATED"}
+                }
+            )
             return data
 
     @classmethod
@@ -74,6 +102,17 @@ class UserService:
             UserRepository.delete_by_id(user_id)
             cls.cache.delete_by_id(user_id)
             cls.cache.delete_list()
+
+            sns.publish(
+                TopicArn=cls.SNS_TOPIC_ARN,
+                Message=json.dumps({
+                    "event": "USER_DELETED",
+                    "user_id": user_id
+                }),
+                MessageAttributes={
+                    "event_type": {"DataType": "String", "StringValue": "USER_DELETED"}
+                }
+            )
 
     @classmethod
     def get_profile(cls, user_id: int):

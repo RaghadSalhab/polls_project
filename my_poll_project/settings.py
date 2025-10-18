@@ -115,16 +115,31 @@ WSGI_APPLICATION = 'my_poll_project.wsgi.application'
 #     }
 # }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'polls_db',      
+#         'USER': 'postgres',         
+#         'PASSWORD': '1234',         
+#         'HOST': 'localhost',        
+#         'PORT': '5432',            
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'polls_db',      
-        'USER': 'postgres',         
-        'PASSWORD': '1234',         
-        'HOST': 'localhost',        
-        'PORT': '5432',            
+        'NAME': 'polls_db',
+        'USER': 'postgres',
+        'PASSWORD': '1234',
+        'HOST': 'host.docker.internal',  # بدل host.docker.internal
+        'PORT': '5432',
     }
 }
+import os
+
+
+
 import environ
 import os
 env = environ.Env()

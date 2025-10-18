@@ -1,10 +1,11 @@
+version: '3.9'
 
 services:
   localstack:
     image: localstack/localstack
     container_name: localstack
     ports:
-      - "4566:4566"
+      - "4566:4566"   
     environment:
       - SERVICES=sqs,sns,s3
       - DEBUG=0
@@ -19,7 +20,6 @@ services:
       retries: 50
       start_period: 10s
 
-
   app:
     build: .
     container_name: my_poll_app
@@ -28,13 +28,33 @@ services:
         condition: service_healthy
     environment:
       - LOCALSTACK_ENDPOINT=http://localstack:4566
-      - DD_TRACE_ENABLED=false
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
       - AWS_DEFAULT_REGION=us-east-1
-      - QUEUE_URL=http://localstack:4566/000000000000/QuestionQueue
+      - QUESTION_QUEUE_URL=http://localstack:4566/000000000000/question-queue
+      - CHOICE_QUEUE_URL=http://localstack:4566/000000000000/choice-queue
+      - USER_QUEUE_URL=http://localstack:4566/000000000000/user-queue
+      - STATS_QUEUE_URL=http://localstack:4566/000000000000/stats-queue
+      - DATABASE_HOST=host.docker.internal
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=polls_db
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=1234
+      - DD_TRACE_ENABLED=false
+      - REDIS_HOST=host.docker.internal
+      - REDIS_PORT=6380
+      - REDIS_DB=0
+
     volumes:
       - .:/app
+    ports:
+      - "8000:8000" 
+    command: >
+      sh -c "python wait_for_db.py &&
+             python -m polls.messaging.messaging_setup &&
+             python -m polls.messaging.consumers.consumer_manager &&
+             python manage.py runserver 0.0.0.0:8000"
+
 
 volumes:
   localstack_data:

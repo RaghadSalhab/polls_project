@@ -6,6 +6,8 @@ from polls.schemas.choice import ChoiceSchema
 from polls.models.database import Session
 from polls.elasticsearch.choice_elasticsearch import ChoiceElasticsearch
 from polls.elasticsearch.log_elasticsearch import LogElasticsearch
+from polls.messaging.clients import sns
+import json
 from ddtrace import tracer 
 
 
@@ -13,6 +15,9 @@ class ChoiceService:
     cache = ChoiceCache()
     es = ChoiceElasticsearch()  
     log_es = LogElasticsearch()  
+
+    #this is the SNS Topic ARN for choice events
+    SNS_TOPIC_ARN = "arn:aws:sns:us-east-1:000000000000:choice-topic"
 
     @staticmethod
     def get_choice(choice_id: int):
@@ -53,17 +58,20 @@ class ChoiceService:
             return data
 
     @staticmethod
-    def create_choice(user, question_id: int, choice_text: str):
+    def create_choice(user_id, question_id: int, choice_text: str):
         with tracer.trace("choice_service.create_choice"):
             question = QuestionRepository.get(question_id)
             if not question:
                 raise ObjectDoesNotExist("Question not found")
-            if question.created_by_id != user.id:
+            if question.created_by_id != user_id:
                 raise PermissionDenied("You cannot add choice to this question")
 
             choice = ChoiceRepository.add(
                 ChoiceRepository.model(question_id=question_id, choice_text=choice_text)
             )
+
+            # Commit changes to DB
+            Session.commit()
 
             ChoiceService.cache.delete_list_for_question(question_id)
             ChoiceService.es.index_choice(choice)
@@ -72,25 +80,41 @@ class ChoiceService:
                 action="CREATE",
                 object_type="CHOICE",
                 object_id=choice.id,
-                message=f"Choice created by user {user.id}",
+                message=f"Choice created by user {user_id}",
                 details={"choice_text": choice_text, "question_id": question_id}
+            )
+            #--- SNS Publish ---
+            sns.publish(
+                TopicArn=ChoiceService.SNS_TOPIC_ARN,
+                Message=json.dumps({
+                    "event": "CHOICE_CREATED",
+                    "choice_id": choice.id,
+                    "question_id": question_id,
+                    "user_id": user_id,
+                    "choice_text": choice_text
+                }),
+                MessageAttributes={
+                    "event_type": {"DataType": "String", "StringValue": "CHOICE_CREATED"}
+                }
             )
             return ChoiceSchema().dump(choice)
 
+
     @staticmethod
-    def update_choice(user, choice_id: int, choice_text: str):
+    def update_choice(user_id, choice_id: int, choice_text: str):
         with tracer.trace("choice_service.update_choice"):
             choice = ChoiceRepository.get(choice_id)
             if not choice:
                 raise ObjectDoesNotExist("Choice not found")
-            if choice.question.created_by_id != user.id:
+            if choice.question.created_by_id != user_id:
                 raise PermissionDenied("You cannot edit this choice")
             if choice.votes > 0:
                 raise PermissionDenied("Cannot edit a choice after votes")
 
             choice.choice_text = choice_text
-            Session.flush()
-            Session.refresh(choice)
+
+            # Commit changes to DB
+            Session.commit()
 
             ChoiceService.cache.delete_by_id(choice_id)
             ChoiceService.cache.delete_list_for_question(choice.question.id)
@@ -100,8 +124,22 @@ class ChoiceService:
                 action="UPDATE",
                 object_type="CHOICE",
                 object_id=choice_id,
-                message=f"Choice updated by user {user.id}",
+                message=f"Choice updated by user {user_id}",
                 details={"choice_text": choice_text}
+            )
+            #--- SNS Publish ---
+            sns.publish(
+                TopicArn=ChoiceService.SNS_TOPIC_ARN,
+                Message=json.dumps({
+                    "event": "CHOICE_UPDATED",
+                    "choice_id": choice_id,
+                    "question_id": choice.question.id,
+                    "user_id": user_id,
+                    "choice_text": choice_text
+                }),
+                MessageAttributes={
+                    "event_type": {"DataType": "String", "StringValue": "CHOICE_UPDATED"}
+                }
             )
             return ChoiceSchema().dump(choice)
 
@@ -125,6 +163,39 @@ class ChoiceService:
                 object_id=choice_id,
                 message=f"Choice deleted by user {user.id}"
             )
+                        # --- SNS Publish ---
+            sns.publish(
+                TopicArn=ChoiceService.SNS_TOPIC_ARN,
+                Message=json.dumps({
+                    "event": "CHOICE_DELETED",
+                    "choice_id": choice_id,
+                    "question_id": choice.question.id,
+                    "user_id": user.id
+                }),
+                MessageAttributes={
+                    "event_type": {"DataType": "String", "StringValue": "CHOICE_DELETED"}
+                }
+            )
+
+    @staticmethod
+    def delete_choice_by_id(choice_id: int):
+        with tracer.trace("choice_service.delete_choice_by_id"):
+            choice = ChoiceRepository.get(choice_id)
+            if not choice:
+                raise ObjectDoesNotExist("Choice not found")
+
+            ChoiceRepository.delete(choice)
+            ChoiceService.cache.delete_by_id(choice_id)
+            # ChoiceService.cache.delete_list_for_question(choice.question.id)
+            ChoiceService.es.delete_choice(choice_id)
+            ChoiceService.log_es.log_event(
+                level="INFO",
+                action="DELETE",
+                object_type="CHOICE",
+                object_id=choice_id,
+                message=f"Choice deleted"
+            )
+
 
     @staticmethod
     def vote(choice_id: int):
@@ -135,6 +206,18 @@ class ChoiceService:
 
             ChoiceService.cache.delete_by_id(choice_id)
             ChoiceService.cache.delete_list_for_question(choice.question.id)
+                        # --- SNS Publish ---
+            sns.publish(
+                TopicArn=ChoiceService.SNS_TOPIC_ARN,
+                Message=json.dumps({
+                    "event": "CHOICE_VOTED",
+                    "choice_id": choice_id,
+                    "question_id": choice.question.id
+                }),
+                MessageAttributes={
+                    "event_type": {"DataType": "String", "StringValue": "CHOICE_VOTED"}
+                }
+            )
             return ChoiceSchema().dump(choice)
 
     @staticmethod

@@ -5,14 +5,13 @@ from polls.schemas.question import QuestionSchema
 from polls.caches.question_cache import QuestionCache
 from polls.elasticsearch.log_elasticsearch import LogElasticsearch
 from ddtrace import tracer
-from polls.aws.sns_client import SNSClient  # ⬅️ أضف هذا في أعلى الملف
-
+from polls.messaging.clients import sns
+import json
 class QuestionService:
     cache = QuestionCache()
     es = QuestionElasticsearch()
-    log_es = LogElasticsearch()  # Init log handler
-    sns_client = SNSClient()  # ⬅️ نجهز SNS client هنا
-
+    log_es = LogElasticsearch() 
+    SNS_TOPIC_ARN = "arn:aws:sns:us-east-1:000000000000:question-topic"
 
     @staticmethod
     def search_questions(keyword: str):
@@ -99,26 +98,11 @@ class QuestionService:
                 details={"results_count": len(data)}
             )
             return data
-
-    # @staticmethod
-    # def create_question(user, question_text: str, choices: list[str] = None):
-    #     with tracer.trace("question_service.create_question"):
-    #         question = QuestionRepository.create_question(user.id, question_text, choices)
-    #         QuestionService.cache.delete_list("all")
-    #         QuestionService.es.index_question(question)
-    #         QuestionService.log_es.log_event(
-    #             level="INFO",
-    #             action="CREATE",
-    #             object_type="QUESTION",
-    #             object_id=question.id,
-    #             message=f"User {user.username} created question",
-    #             details={"question_text": question_text}
-    #         )
-    #         return QuestionSchema().dump(question)
+        
     @staticmethod
     def create_question(user, question_text: str, choices: list[str] = None):
         with tracer.trace("question_service.create_question"):
-            question = QuestionRepository.create_question(user.id, question_text, choices)
+            question = QuestionRepository.create_question(user.id, question_text)
             QuestionService.cache.delete_list("all")
             QuestionService.es.index_question(question)
             QuestionService.log_es.log_event(
@@ -129,20 +113,25 @@ class QuestionService:
                 message=f"User {user.username} created question",
                 details={"question_text": question_text}
             )
-
-            QuestionService.sns_client.publish(
-                topic_arn="arn:aws:sns:us-east-1:000000000000:QuestionEvents",
-                message={
+                        # --- SNS Publish ---
+            sns.publish(
+                TopicArn=QuestionService.SNS_TOPIC_ARN,
+                Message=json.dumps({
                     "event": "QUESTION_CREATED",
                     "question_id": question.id,
                     "user_id": user.id,
-                    "username": user.username,
-                    "question_text": question_text
+                    "question_text": question_text,
+                    "choices": choices
+                }),
+                MessageAttributes={
+                    "event_type": {"DataType": "String", "StringValue": "QUESTION_CREATED"}
                 }
             )
+            
+            print("📤 SNS message published successfully to:", QuestionService.SNS_TOPIC_ARN)
 
             return QuestionSchema().dump(question)
-        
+                
     @staticmethod
     def update_question(user, question_id: int, question_text: str, choices: list[dict] = None):
         with tracer.trace("question_service.update_question"):
@@ -166,7 +155,7 @@ class QuestionService:
                 )
                 raise PermissionDenied("You cannot edit this question")
 
-            question = QuestionRepository.update_question(question_id, question_text, choices)
+            question = QuestionRepository.update_question(question_id, question_text)
             QuestionService.cache.delete_by_id(question_id)
             QuestionService.cache.delete_list("all")
             QuestionService.es.update_question(question_id, {"question_text": question_text})
@@ -178,6 +167,20 @@ class QuestionService:
                 message=f"User {user.username} updated question",
                 details={"question_text": question_text}
             )
+            sns.publish(
+                TopicArn=QuestionService.SNS_TOPIC_ARN,
+                Message=json.dumps({
+                    "event": "QUESTION_UPDATED",
+                    "question_id": question.id,
+                    "user_id": user.id,
+                    "question_text": question_text,
+                    "choices": choices
+                }),
+                MessageAttributes={
+                    "event_type": {"DataType": "String", "StringValue": "QUESTION_UPDATED"}
+                }
+            )
+
             return QuestionSchema().dump(question)
 
     @staticmethod
@@ -203,7 +206,7 @@ class QuestionService:
                 )
                 raise PermissionDenied("You cannot delete this question")
 
-            QuestionRepository.delete(question_id)
+            QuestionRepository.delete_by_id(question_id)
             QuestionService.cache.delete_by_id(question_id)
             QuestionService.cache.delete_list("all")
             QuestionService.es.delete_question(question_id)
@@ -214,6 +217,18 @@ class QuestionService:
                 object_id=question_id,
                 message=f"User {user.username} deleted question"
             )
+            sns.publish(
+                TopicArn=QuestionService.SNS_TOPIC_ARN,
+                Message=json.dumps({
+                    "event": "QUESTION_DELETED",
+                    "question_id": question_id,
+                    "user_id": user.id
+                }),
+                MessageAttributes={
+                    "event_type": {"DataType": "String", "StringValue": "QUESTION_DELETED"}
+                }
+            )
+
 
     @staticmethod
     def list_questions_for_user(user_id: int):
