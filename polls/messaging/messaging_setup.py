@@ -31,7 +31,6 @@ def create_queue(name, dlq_name=None):
 
     return {"url": queue_url, "arn": queue_arn, "dlq_arn": dlq_arn}
 
-#allow SNS to send messages to SQS queue
 def attach_sns_policy(queue_arn, topic_arn, queue_url):
     policy = {
         "Version": "2012-10-17",
@@ -51,14 +50,17 @@ def attach_sns_policy(queue_arn, topic_arn, queue_url):
     )
     print(f"🔑 Policy attached to {queue_url}")
 
-def subscribe_queue(topic_arn, queue_arn):
-    sns.subscribe(
-        TopicArn=topic_arn,
-        Protocol="sqs",
-        Endpoint=queue_arn
-    )
-    print(f"🔗 Queue {queue_arn} subscribed to Topic {topic_arn}")
-
+def subscribe_queue(topic_arn, queue_arn, filter_policy=None):
+    """Subscribe queue to SNS topic with optional filter policy."""
+    params = {
+        "TopicArn": topic_arn,
+        "Protocol": "sqs",
+        "Endpoint": queue_arn
+    }
+    if filter_policy:
+        params["Attributes"] = {"FilterPolicy": json.dumps(filter_policy)}
+    sns.subscribe(**params)
+    print(f"🔗 Queue {queue_arn} subscribed to Topic {topic_arn} with filter {filter_policy}")
 
 def setup_all():
     print("🚀 Starting messaging setup...")
@@ -77,22 +79,27 @@ def setup_all():
         "stats": create_queue("stats-queue", dlq_name="stats-dlq")
     }
 
-    attach_sns_policy(queues["question"]["arn"], topics["question"], queues["question"]["url"])
-    attach_sns_policy(queues["choice"]["arn"], topics["choice"], queues["choice"]["url"])
-    attach_sns_policy(queues["user"]["arn"], topics["user"], queues["user"]["url"])
-    attach_sns_policy(queues["stats"]["arn"], topics["stats"], queues["stats"]["url"])
-    attach_sns_policy(queues["choice"]["arn"], topics["question"], queues["choice"]["url"])  
+    for q_key in queues:
+        attach_sns_policy(queues[q_key]["arn"], topics[q_key], queues[q_key]["url"])
 
+
+    subscribe_queue(
+        topics["question"], queues["choice"]["arn"],
+        filter_policy={"event_type": ["QUESTION_CREATED", "QUESTION_UPDATED"]}
+    )
+    subscribe_queue(
+        topics["choice"], queues["choice"]["arn"],
+        filter_policy={"event_type": ["QUESTION_CREATED", "QUESTION_UPDATED"]}
+    )
+
+    subscribe_queue(
+        topics["choice"], queues["stats"]["arn"],
+        filter_policy={"event_type": ["CHOICE_VOTED"]}
+    )
 
     subscribe_queue(topics["question"], queues["question"]["arn"])
-    subscribe_queue(topics["choice"], queues["choice"]["arn"])
-    subscribe_queue(topics["question"], queues["choice"]["arn"])  
     subscribe_queue(topics["user"], queues["user"]["arn"])
-    subscribe_queue(topics["user"], queues["question"]["arn"])
     subscribe_queue(topics["stats"], queues["stats"]["arn"])
-    subscribe_queue(topics["choice"], queues["stats"]["arn"])
-
-
 
     print("🎉 Messaging setup completed successfully!")
     return {"topics": topics, "queues": queues}
