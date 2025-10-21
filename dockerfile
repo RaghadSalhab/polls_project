@@ -19,4 +19,4 @@ RUN pip install -r requirements.txt
 
 COPY . /app
 
-CMD ["sh", "-c", "python wait_for_db.py && python -m polls.messaging.messaging_setup && python -m polls.messaging.consumers.consumer_manager & python manage.py runserver 0.0.0.0:8000"]
+CMD ["sh", "-c", "python wait_for_db.py && python -m polls.messaging.infrastructure.setup && python -m polls.messaging.consumers.consumer_manager & python manage.py runserver 0.0.0.0:8000"]

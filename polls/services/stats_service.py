@@ -3,7 +3,7 @@ from polls.repositories.stats_repository import StatsRepository
 from polls.schemas.question import QuestionSchema
 from polls.schemas.choice import ChoiceSchema
 from polls.caches.stats_cache import StatsCache
-from polls.messaging.clients import sns 
+from polls.messaging.core.clients import sns 
 from ddtrace import tracer
 import json
 class StatsService:

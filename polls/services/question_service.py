@@ -5,8 +5,10 @@ from polls.schemas.question import QuestionSchema
 from polls.caches.question_cache import QuestionCache
 from polls.elasticsearch.log_elasticsearch import LogElasticsearch
 from ddtrace import tracer
-from polls.messaging.clients import sns
+from polls.messaging.core.clients import sns
 import json
+from polls.messaging.core.event_publisher import EventPublisher
+
 class QuestionService:
     cache = QuestionCache()
     es = QuestionElasticsearch()
@@ -40,16 +42,16 @@ class QuestionService:
     @staticmethod
     def get_question(question_id: int):
         with tracer.trace("question_service.get_question"):
-            cached = QuestionService.cache.get_by_id(question_id)
-            if cached:
-                QuestionService.log_es.log_event(
-                    level="INFO",
-                    action="GET_CACHE_HIT",
-                    object_type="QUESTION",
-                    object_id=question_id,
-                    message=f"Fetched question from cache"
-                )
-                return cached
+            # cached = QuestionService.cache.get_by_id(question_id)
+            # if cached:
+            #     QuestionService.log_es.log_event(
+            #         level="INFO",
+            #         action="GET_CACHE_HIT",
+            #         object_type="QUESTION",
+            #         object_id=question_id,
+            #         message=f"Fetched question from cache"
+            #     )
+            #     return cached
 
             question = QuestionRepository.get(question_id)
             if not question:
@@ -113,21 +115,16 @@ class QuestionService:
                 message=f"User {user.username} created question",
                 details={"question_text": question_text}
             )
-                        # --- SNS Publish ---
-            sns.publish(
-                TopicArn=QuestionService.SNS_TOPIC_ARN,
-                Message=json.dumps({
-                    "event": "QUESTION_CREATED",
+            EventPublisher.publish_question_event(
+                "QUESTION_CREATED",
+                {
                     "question_id": question.id,
                     "user_id": user.id,
                     "question_text": question_text,
-                    "choices": choices
-                }),
-                MessageAttributes={
-                    "event_type": {"DataType": "String", "StringValue": "QUESTION_CREATED"}
+                    "choices": choices or []
                 }
             )
-            
+
             print("📤 SNS message published successfully to:", QuestionService.SNS_TOPIC_ARN)
 
             return QuestionSchema().dump(question)
@@ -167,17 +164,13 @@ class QuestionService:
                 message=f"User {user.username} updated question",
                 details={"question_text": question_text}
             )
-            sns.publish(
-                TopicArn=QuestionService.SNS_TOPIC_ARN,
-                Message=json.dumps({
-                    "event": "QUESTION_UPDATED",
+            EventPublisher.publish_question_event(
+                "QUESTION_UPDATED",
+                {
                     "question_id": question.id,
                     "user_id": user.id,
                     "question_text": question_text,
-                    "choices": choices
-                }),
-                MessageAttributes={
-                    "event_type": {"DataType": "String", "StringValue": "QUESTION_UPDATED"}
+                    "choices": choices or []
                 }
             )
 
@@ -217,18 +210,13 @@ class QuestionService:
                 object_id=question_id,
                 message=f"User {user.username} deleted question"
             )
-            sns.publish(
-                TopicArn=QuestionService.SNS_TOPIC_ARN,
-                Message=json.dumps({
-                    "event": "QUESTION_DELETED",
+            EventPublisher.publish_question_event(
+                "QUESTION_DELETED",
+                {
                     "question_id": question_id,
                     "user_id": user.id
-                }),
-                MessageAttributes={
-                    "event_type": {"DataType": "String", "StringValue": "QUESTION_DELETED"}
                 }
             )
-
 
     @staticmethod
     def list_questions_for_user(user_id: int):

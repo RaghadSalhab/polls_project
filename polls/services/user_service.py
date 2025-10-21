@@ -3,7 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from polls.repositories.user_repository import UserRepository
 from polls.schemas.user import UserSchema
 from polls.caches.user_cache import UserCache
-from polls.messaging.clients import sns  
+from polls.messaging.core.clients import sns  
 from ddtrace import tracer
 import json
 class UserService:

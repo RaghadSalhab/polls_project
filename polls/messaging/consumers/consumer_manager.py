@@ -1,6 +1,6 @@
 import threading
 import time
-from polls.messaging.messaging_setup import setup_all
+from polls.messaging.infrastructure.setup import setup_all
 from polls.messaging.consumers.choice_consumer import consume_choice_queue
 from polls.messaging.consumers.question_consumer import consume_question_queue
 from polls.messaging.consumers.user_consumer import consume_user_queue

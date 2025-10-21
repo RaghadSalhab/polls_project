@@ -13,6 +13,8 @@ DATABASE_URL = "postgresql+psycopg2://postgres:1234@host.docker.internal:5432/po
 engine = create_engine(DATABASE_URL, echo=False)
 SessionFactory = sessionmaker(bind=engine, expire_on_commit=False)
 Session = scoped_session(SessionFactory,scopefunc=get_current_request)  
+ConsumerSession = sessionmaker(bind=engine, expire_on_commit=False)
+
 Base = declarative_base()
 # Base.metadata.create_all(bind=engine)
 
