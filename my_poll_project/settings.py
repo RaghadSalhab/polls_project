@@ -152,7 +152,33 @@ tracer.set_tags({
     "project": "polls_app"
 })
 
-
+# settings
+AWS = {
+    "SQS": {
+        "QUESTION": {
+            "QUESTION_QUEUE": "http://localhost:4566/000000000000/question-queue",
+            "QUESTION_DLQ": "http://localhost:4566/000000000000/question-dlq",
+        },
+        "CHOICE": {
+            "CHOICE_QUEUE": "http://localhost:4566/000000000000/choice-queue",
+            "CHOICE_DLQ": "http://localhost:4566/000000000000/choice-dlq",
+        },
+        "USER": {
+            "USER_QUEUE": "http://localhost:4566/000000000000/user-queue",
+            "USER_DLQ": "http://localhost:4566/000000000000/user-dlq",
+        },
+        "STATS": {
+            "STATS_QUEUE": "http://localhost:4566/000000000000/stats-queue",
+            "STATS_DLQ": "http://localhost:4566/000000000000/stats-dlq",
+        }
+    },
+    "SNS": {
+        "QUESTION_TOPIC": "arn:aws:sns:us-east-1:000000000000:question-topic",
+        "CHOICE_TOPIC": "arn:aws:sns:us-east-1:000000000000:choice-topic",
+        "USER_TOPIC": "arn:aws:sns:us-east-1:000000000000:user-topic",
+        "STATS_TOPIC": "arn:aws:sns:us-east-1:000000000000:stats-topic",
+    }
+}
 
 
 # Password validation

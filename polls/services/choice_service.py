@@ -74,12 +74,10 @@ class ChoiceService:
 
             ChoiceService.cache.delete_list_for_question(question_id)
             
-            # ✅ أصلح الـ Elasticsearch error فقط
             try:
                 ChoiceService.es.index_choice(choice)
             except Exception as e:
                 print(f"⚠️ Elasticsearch indexing failed (will retry): {e}")
-                # ما توقف العملية - استمر
             
             # ChoiceService.log_es.log_event(
             #     level="INFO",
