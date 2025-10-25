@@ -2,7 +2,10 @@ import os
 from .base_consumer import BaseConsumer
 from polls.messaging.handlers.handler_registry import choice_registry
 
-CHOICE_QUEUE_URL = os.getenv("CHOICE_QUEUE_URL")
+# CHOICE_QUEUE_URL = os.getenv("CHOICE_QUEUE_URL")
+from django.conf import settings
+
+CHOICE_QUEUE_URL = settings.AWS["SQS"]["CHOICE"]["CHOICE_QUEUE"]
 
 class ChoiceConsumer(BaseConsumer):
     def __init__(self):

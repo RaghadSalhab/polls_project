@@ -10,7 +10,6 @@ https://docs.djangoproject.com/en/5.2/howto/deployment/asgi/
 import os
 
 from django.core.asgi import get_asgi_application
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'my_poll_project.settings')
-
+env = os.getenv("DJANGO_ENV", "local").lower()
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"my_poll_project.settings.{env}")
 application = get_asgi_application()

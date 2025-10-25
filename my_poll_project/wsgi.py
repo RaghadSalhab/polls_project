@@ -10,7 +10,7 @@ https://docs.djangoproject.com/en/5.2/howto/deployment/wsgi/
 import os
 
 from django.core.wsgi import get_wsgi_application
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'my_poll_project.settings')
+env = os.getenv("DJANGO_ENV", "local").lower()
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"my_poll_project.settings.{env}")
 
 application = get_wsgi_application()

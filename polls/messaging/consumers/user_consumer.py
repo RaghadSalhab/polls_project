@@ -4,7 +4,9 @@ from .base_consumer import BaseConsumer
 from polls.messaging.handlers.handler_registry import user_registry
 
 logger = logging.getLogger(__name__)
-USER_QUEUE_URL = os.getenv("USER_QUEUE_URL")
+# USER_QUEUE_URL = os.getenv("USER_QUEUE_URL")
+from django.conf import settings
+USER_QUEUE_URL = settings.AWS["SQS"]["USER"]["USER_QUEUE"]
 
 class UserConsumer(BaseConsumer):
     def __init__(self):

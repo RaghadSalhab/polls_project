@@ -4,7 +4,10 @@ from polls.messaging.consumers.base_consumer import BaseConsumer
 from polls.messaging.handlers.handler_registry import stats_registry
 
 logger = logging.getLogger(__name__)
-STATS_QUEUE_URL = os.getenv("STATS_QUEUE_URL")
+# STATS_QUEUE_URL = os.getenv("STATS_QUEUE_URL")
+from django.conf import settings
+
+STATS_QUEUE_URL = settings.AWS["SQS"]["STATS"]["STATS_QUEUE"]
 
 class StatsConsumer(BaseConsumer):
     
