@@ -37,3 +37,32 @@ REDIS_PORT = env("REDIS_PORT", default=6380)
 REDIS_DB = env("REDIS_DB", default=0)
 REDIS_PASSWORD = env("REDIS_PASSWORD", default="")
 REDIS_MAX_CONNECTIONS = env("REDIS_MAX_CONNECTIONS", default=50)
+AWS = {
+    "SQS": {
+        "TEAM_RECOGNITION": {
+            "RECOGNITION_UPDATES": "prod-team-recognition-updates",
+            "RECOGNITION_UPDATES_BALMM": "prod-team-recognition-updates-balmm"
+        },
+        "DEV_TEST": {
+            "DEV_QUEUE": "dev-team-queue",
+        }
+    },
+    "SNS": {
+        "NOTIFICATIONS": 'arn:aws:sns:us-east-1:000000000000:prod-team-recognition-notifications',
+        "DEV_ALERTS": "dev-alerts-topic"
+    },
+    "S3": {
+        "MEDIA_BUCKET": "prod-media-bucket",
+        "DEV_BUCKET": "dev-media-bucket"
+    },
+    "LAMBDA": {
+        "PROCESSOR": "prod-data-processor",
+        "DEV_PROCESSOR": "dev-data-processor"
+    },
+    "BEDROCK": {
+        "MODEL_ARN": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-lite-v1:0"
+    },
+    "OTHER": {
+        "RANDOM_ARN": "arn:aws:service:us-east-1:000000000000:random-resource"
+    }
+}

@@ -96,29 +96,59 @@ SIMPLE_JWT = {
 tracer.set_tags({"project": "polls_app"})
 
 # AWS mock (LocalStack)
+# AWS = {
+#     "SQS": {
+#         "QUESTION": {
+#             "QUESTION_QUEUE": "http://localhost:4566/000000000000/question-queue",
+#             "QUESTION_DLQ": "http://localhost:4566/000000000000/question-dlq",
+#         },
+#         "CHOICE": {
+#             "CHOICE_QUEUE": "http://localhost:4566/000000000000/choice-queue",
+#             "CHOICE_DLQ": "http://localhost:4566/000000000000/choice-dlq",
+#         },
+#         "USER": {
+#             "USER_QUEUE": "http://localhost:4566/000000000000/user-queue",
+#             "USER_DLQ": "http://localhost:4566/000000000000/user-dlq",
+#         },
+#         "STATS": {
+#             "STATS_QUEUE": "http://localhost:4566/000000000000/stats-queue",
+#             "STATS_DLQ": "http://localhost:4566/000000000000/stats-dlq",
+#         },
+#     },
+#     "SNS": {
+#         "QUESTION_TOPIC": "arn:aws:sns:us-east-1:000000000000:question-topic",
+#         "CHOICE_TOPIC": "arn:aws:sns:us-east-1:000000000000:choice-topic",
+#         "USER_TOPIC": "arn:aws:sns:us-east-1:000000000000:user-topic",
+#         "STATS_TOPIC": "arn:aws:sns:us-east-1:000000000000:stats-topic",
+#     },
+# }
+
 AWS = {
     "SQS": {
-        "QUESTION": {
-            "QUESTION_QUEUE": "http://localhost:4566/000000000000/question-queue",
-            "QUESTION_DLQ": "http://localhost:4566/000000000000/question-dlq",
+        "TEAM_RECOGNITION": {
+            "RECOGNITION_UPDATES": "prod-team-recognition-updates",
+            "RECOGNITION_UPDATES_BALMM": "prod-team-recognition-updates-balmm"
         },
-        "CHOICE": {
-            "CHOICE_QUEUE": "http://localhost:4566/000000000000/choice-queue",
-            "CHOICE_DLQ": "http://localhost:4566/000000000000/choice-dlq",
-        },
-        "USER": {
-            "USER_QUEUE": "http://localhost:4566/000000000000/user-queue",
-            "USER_DLQ": "http://localhost:4566/000000000000/user-dlq",
-        },
-        "STATS": {
-            "STATS_QUEUE": "http://localhost:4566/000000000000/stats-queue",
-            "STATS_DLQ": "http://localhost:4566/000000000000/stats-dlq",
-        },
+        "DEV_TEST": {
+            "DEV_QUEUE": "dev-team-queue",
+        }
     },
     "SNS": {
-        "QUESTION_TOPIC": "arn:aws:sns:us-east-1:000000000000:question-topic",
-        "CHOICE_TOPIC": "arn:aws:sns:us-east-1:000000000000:choice-topic",
-        "USER_TOPIC": "arn:aws:sns:us-east-1:000000000000:user-topic",
-        "STATS_TOPIC": "arn:aws:sns:us-east-1:000000000000:stats-topic",
+        "NOTIFICATIONS": 'arn:aws:sns:us-east-1:000000000000:prod-team-recognition-notifications',
+        "DEV_ALERTS": "dev-alerts-topic"
     },
+    "S3": {
+        "MEDIA_BUCKET": "prod-media-bucket",
+        "DEV_BUCKET": "dev-media-bucket"
+    },
+    "LAMBDA": {
+        "PROCESSOR": "prod-data-processor",
+        "DEV_PROCESSOR": "dev-data-processor"
+    },
+    "BEDROCK": {
+        "MODEL_ARN": "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-lite-v1:0"
+    },
+    "OTHER": {
+        "RANDOM_ARN": "arn:aws:service:us-east-1:000000000000:random-resource"
+    }
 }
