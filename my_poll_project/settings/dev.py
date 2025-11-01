@@ -4,14 +4,88 @@ import os
 import environ
 from pathlib import Path
 
-# Load environment variables
-BASE_DIR = Path(__file__).resolve().parent.parent
-env = environ.Env()
-environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
+# # Load environment variables
+# BASE_DIR = Path(__file__).resolve().parent.parent
+# env = environ.Env()
+# environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
-# Django settings
-DEBUG = env.bool("DEBUG", default=True)
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["*"])
+# # Django settings
+# DEBUG = env.bool("DEBUG", default=True)
+# ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["*"])
+
+
+# # LocalStack / AWS for Dev
+# LOCALSTACK_ENDPOINT = env("LOCALSTACK_ENDPOINT", default="http://localstack:4566")
+# AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID", default="test")
+# AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY", default="test")
+# AWS_DEFAULT_REGION = env("AWS_DEFAULT_REGION", default="us-east-1")
+
+# # Redis
+# REDIS_HOST = env("REDIS_HOST", default="host.docker.internal")
+# REDIS_PORT = env("REDIS_PORT", default=6380)
+# REDIS_DB = env("REDIS_DB", default=0)
+# REDIS_PASSWORD = env("REDIS_PASSWORD", default="")
+# REDIS_MAX_CONNECTIONS = env("REDIS_MAX_CONNECTIONS", default=50)
+
+# AWS = {
+#     'SQS': {
+#         'NOTIFICATION_QUEUE': 'user-notifications',
+#         'PROCESS_QUEUE': 'image-processing',
+#         'DEAD_LETTER_QUEUE': 'dlq-main'
+#     },
+#     'S3': {
+#         'UPLOADS_BUCKET': 'user-uploads',
+#         'BACKUP_BUCKET': 'app-backups'
+#     },
+#     'SNS': {
+#         'ALERTS_TOPIC': 'system-alerts'
+#     },
+#     "KINESIS": {
+#         "STREAMS": {
+#             "DEV_STREAM": "dev-data-stream",
+#             "TEAM_RECOGNITION_STREAM": "team-recognition-stream"
+#         }
+#     },
+# }
+
+# raghad_project/settings/dev.py
+import os
+DEBUG = True  # لتسهيل التطوير المحلي
+ALLOWED_HOSTS = ['*']  # يسمح لكل المضيفين للوصول
+
+# Example API URLs
+RAGHAD_API_BASE_URL = "http://core-api.dev-core-api.svc.cluster.local"
+TEAM_SCHEDULING_BASE_URL = "http://team-scheduling.dev-core-api.svc.cluster.local"
+
+# AWS resources
+AWS = {
+    "SQS": {
+        "TEAM_RECOGNITION": {
+            "RECOGNITION_UPDATES": "prod-team-recognition-updates",
+            "RECOGNITION_UPDATES_BALMM": "prod-team-recognition-updates-balmm"
+        },
+        "QUERY_EXECUTOR": "prod-query-executor-queue"
+    },
+    "SNS": {
+        "NOTIFICATIONS": "arn:aws:sns:us-east-1:123456789012:prod-team-recognition-notifications"
+    }
+}
+
+# # Logging
+# LOGGING = {
+#     "version": 1,
+#     "handlers": {
+#         "console": {
+#             "class": "logging.handlers.SysLogHandler",
+#             "facility": "local0",
+#             "address": "/dev/log"
+#         }
+#     },
+#     "root": {
+#         "handlers": ["console"],
+#         "level": "INFO",
+#     },
+# }
 
 # Database
 DATABASES = {
@@ -25,36 +99,7 @@ DATABASES = {
     }
 }
 
-# LocalStack / AWS for Dev
-LOCALSTACK_ENDPOINT = env("LOCALSTACK_ENDPOINT", default="http://localstack:4566")
-AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID", default="test")
-AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY", default="test")
-AWS_DEFAULT_REGION = env("AWS_DEFAULT_REGION", default="us-east-1")
 
-# Redis
-REDIS_HOST = env("REDIS_HOST", default="host.docker.internal")
-REDIS_PORT = env("REDIS_PORT", default=6380)
-REDIS_DB = env("REDIS_DB", default=0)
-REDIS_PASSWORD = env("REDIS_PASSWORD", default="")
-REDIS_MAX_CONNECTIONS = env("REDIS_MAX_CONNECTIONS", default=50)
-
-AWS = {
-    'SQS': {
-        'NOTIFICATION_QUEUE': 'user-notifications',
-        'PROCESS_QUEUE': 'image-processing',
-        'DEAD_LETTER_QUEUE': 'dlq-main'
-    },
-    'S3': {
-        'UPLOADS_BUCKET': 'user-uploads',
-        'BACKUP_BUCKET': 'app-backups'
-    },
-    'SNS': {
-        'ALERTS_TOPIC': 'system-alerts'
-    },
-    "KINESIS": {
-        "STREAMS": {
-            "DEV_STREAM": "dev-data-stream",
-            "TEAM_RECOGNITION_STREAM": "team-recognition-stream"
-        }
-    },
-}
+# External integrations
+SLACK_TOKEN = "xoxb-prod-token"
+ASYNC_STARTUP_THREADS = ["aws_sqs_thread"]
