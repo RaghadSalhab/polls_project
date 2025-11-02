@@ -1,5 +1,6 @@
 version: "3.9"
 services:
+  # ---------- LocalStack ----------
   localstack:
     image: localstack/localstack:latest
     container_name: localstack_service
@@ -18,36 +19,74 @@ services:
       retries: 50
       start_period: 10s
 
-  setup_localstack:
+  # ---------- Setup for Publisher ----------
+  setup_localstack_publisher:
     build: .
-    container_name: setup_localstack_service
+    container_name: setup_localstack_publisher_service
     environment:
-      - LOCALSTACK_ENDPOINT=http://localstack:4566
-      - AWS_DEFAULT_REGION=us-east-1
-      - DD_TRACE_ENABLED=false
+      LOCALSTACK_ENDPOINT: http://localstack:4566
+      AWS_DEFAULT_REGION: us-east-1
+      APP_ROLE: PUBLISHER
+      DD_TRACE_ENABLED: false
     command: python manage.py setup_localstack
     depends_on:
       localstack:
         condition: service_healthy
 
-  app:
+  # ---------- Setup for Consumer ----------
+  setup_localstack_consumer:
     build: .
-    container_name: my_poll_app
+    container_name: setup_localstack_consumer_service
+    environment:
+      LOCALSTACK_ENDPOINT: http://localstack:4566
+      AWS_DEFAULT_REGION: us-east-1
+      APP_ROLE: CONSUMER
+      DD_TRACE_ENABLED: false
+    command: python manage.py setup_localstack
     depends_on:
-      setup_localstack:
+      localstack:
+        condition: service_healthy
+
+  # ---------- Publisher App ----------
+  publisher:
+    build: .
+    container_name: my_poll_app_publisher
+    environment:
+      DJANGO_ENV: local
+      APP_ROLE: PUBLISHER
+      LOCALSTACK_ENDPOINT: http://localstack:4566
+      AWS_DEFAULT_REGION: us-east-1
+      DD_TRACE_ENABLED: false
+    depends_on:
+      setup_localstack_publisher:
         condition: service_completed_successfully
     env_file:
       - .env
-    environment:
-      - DJANGO_ENV=local
-      - DJANGO_SETTINGS_MODULE=my_poll_project.settings.local
-      - LOCALSTACK_ENDPOINT=http://localstack:4566
-      - AWS_DEFAULT_REGION=us-east-1
-      - DD_TRACE_ENABLED=false
     volumes:
       - .:/app
     ports:
       - "8000:8000"
     command: >
-      sh -c "python wait_for_db.py &&
-             python manage.py runserver 0.0.0.0:8000"
+      sh -c "sleep 5 && python wait_for_db.py && python manage.py runserver 0.0.0.0:8000"
+
+  # ---------- Consumer App ----------
+  consumer:
+    build: .
+    container_name: my_poll_app_consumer
+    environment:
+      DJANGO_ENV: local
+      APP_ROLE: CONSUMER
+      LOCALSTACK_ENDPOINT: http://localstack:4566
+      AWS_DEFAULT_REGION: us-east-1
+      DD_TRACE_ENABLED: false
+    depends_on:
+      setup_localstack_consumer:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    ports:
+      - "8001:8000"
+    command: >
+      sh -c "sleep 5 && python wait_for_db.py && python manage.py runserver 0.0.0.0:8000"

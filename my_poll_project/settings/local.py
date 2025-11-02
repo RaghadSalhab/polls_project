@@ -31,6 +31,7 @@ DATABASES = {
     }
 }
 
+
 if LOCALSTACK_ENABLED:
     print("🔄 Redirecting all *_BASE_URL to LocalStack (http://localhost:4566) ...")
 
