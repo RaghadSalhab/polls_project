@@ -6,12 +6,10 @@ services:
     ports:
       - "4566:4566"
     environment:
-      - SERVICES=sqs,sns,s3,lambda,kinesis,dynamodb,events
-      - AWS_ACCESS_KEY_ID=test
+      - SERVICES=sqs,sns,s3,lambda,kinesis
       - AWS_SECRET_ACCESS_KEY=test
       - AWS_DEFAULT_REGION=us-east-1
     volumes:
-      - ./localstack-init/ready.d:/etc/localstack/init/ready.d
       - /var/run/docker.sock:/var/run/docker.sock
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:4566/_localstack/health || exit 1"]
@@ -36,15 +34,16 @@ services:
     build: .
     container_name: my_poll_app
     depends_on:
-      - setup_localstack
+      setup_localstack:
+        condition: service_completed_successfully
     env_file:
       - .env
     environment:
-      - DJANGO_ENV=dev
-      - DD_TRACE_ENABLED=false
-      - DJANGO_SETTINGS_MODULE=my_poll_project.settings.dev
+      - DJANGO_ENV=local
+      - DJANGO_SETTINGS_MODULE=my_poll_project.settings.local
       - LOCALSTACK_ENDPOINT=http://localstack:4566
       - AWS_DEFAULT_REGION=us-east-1
+      - DD_TRACE_ENABLED=false
     volumes:
       - .:/app
     ports:

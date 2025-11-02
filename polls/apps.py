@@ -13,7 +13,7 @@ class PollsConfig(AppConfig):
                 time.sleep(2)
                 from .messaging.core.setup_local_messaging import run_setup
                 print("🚀 Running setup now...")
-                run_setup()
+                # run_setup()
             except Exception as e:
                 import traceback
                 print("❌ Error in ready():", e)

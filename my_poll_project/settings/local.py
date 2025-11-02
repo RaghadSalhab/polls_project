@@ -9,6 +9,16 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'my_poll_project.settings.local'
 
 LOCALSTACK_ENABLED = os.getenv("USE_LOCALSTACK", "True") == "True"
 
+
+# Load environment variables
+BASE_DIR = Path(__file__).resolve().parent.parent
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
+
+# Django settings
+DEBUG = env.bool("DEBUG", default=True)
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["*"])
+
 # Database
 DATABASES = {
     'default': {
