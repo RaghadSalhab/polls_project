@@ -22,7 +22,6 @@ def main():
     env = os.getenv("DJANGO_ENV", "local").lower()
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"my_poll_project.settings.{env}")
 
-    # ROLE لتحديد Publisher أو Consumer
     role = os.getenv("ROLE", "PUBLISHER").upper()
     os.environ.setdefault("APP_ROLE", role)
 

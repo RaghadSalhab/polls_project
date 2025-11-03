@@ -163,3 +163,43 @@ class Command(BaseCommand):
         except ClientError as e:
             self.stdout.write(f"❌ Failed to create SNS topic {topic_name}: {e}")
             return "ERROR"
+        
+    def subscribe_queue_to_topic(self, sns_client, sqs_client, topic_arn, queue_name):
+        queue_url = sqs_client.get_queue_url(QueueName=queue_name)['QueueUrl']
+        queue_attrs = sqs_client.get_queue_attributes(
+            QueueUrl=queue_url,
+            AttributeNames=['QueueArn']
+        )
+        queue_arn = queue_attrs['Attributes']['QueueArn']
+
+        # نضيف صلاحيات للـ SNS إنه يقدر يرسل للـ SQS
+        policy = f"""{{
+            "Version": "2012-10-17",
+            "Statement": [
+                {{
+                    "Effect": "Allow",
+                    "Principal": "*",
+                    "Action": "sqs:SendMessage",
+                    "Resource": "{queue_arn}",
+                    "Condition": {{
+                        "ArnEquals": {{
+                            "aws:SourceArn": "{topic_arn}"
+                        }}
+                    }}
+                }}
+            ]
+        }}"""
+
+        sqs_client.set_queue_attributes(
+            QueueUrl=queue_url,
+            Attributes={"Policy": policy}
+        )
+
+        # إنشاء الاشتراك بين SNS و SQS
+        sns_client.subscribe(
+            TopicArn=topic_arn,
+            Protocol='sqs',
+            Endpoint=queue_arn
+        )
+
+        self.stdout.write(f"🔗 Subscribed {queue_name} to {topic_arn}")

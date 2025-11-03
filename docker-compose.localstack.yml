@@ -1,0 +1,25 @@
+version: "3.9"
+services:
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack_service
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=sqs,sns,s3,lambda,kinesis
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=us-east-1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - my_poll_network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4566/_localstack/health || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 50
+      start_period: 10s
+
+networks:
+  my_poll_network:
+    external: true

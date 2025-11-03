@@ -1,0 +1,26 @@
+version: "3.9"
+services:
+  localstack1:
+    image: localstack/localstack:latest
+    container_name: localstack_service_test
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+      - AWS_DEFAULT_REGION=us-east-1
+  localstack2:
+    image: localstack/localstack:latest
+    container_name: localstack_service_test
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+      - AWS_DEFAULT_REGION=us-east-1
+  localstack3:
+    image: localstack/localstack:latest
+    container_name: localstack_service_test33
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+      - AWS_DEFAULT_REGION=us-east-1

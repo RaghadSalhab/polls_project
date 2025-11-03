@@ -1,0 +1,117 @@
+# version: "3.9"
+# services:
+#   setup_localstack_consumer:
+#     build: .
+#     container_name: setup_localstack_consumer_service
+#     environment:
+#       LOCALSTACK_ENDPOINT: http://localstack:4566
+#       AWS_DEFAULT_REGION: us-east-1
+#       APP_ROLE: CONSUMER
+#       DD_TRACE_ENABLED: false
+#     command: python manage.py setup_localstack
+#     networks:
+#       - my_poll_network
+
+#   consumer:
+#     build: .
+#     container_name: my_poll_app_consumer
+#     environment:
+#       DJANGO_ENV: local
+#       APP_ROLE: CONSUMER
+#       LOCALSTACK_ENDPOINT: http://localstack:4566
+#       AWS_DEFAULT_REGION: us-east-1
+#       DD_TRACE_ENABLED: false
+#     depends_on:
+#       - setup_localstack_consumer
+#     env_file:
+#       - .env
+#     volumes:
+#       - .:/app
+#     ports:
+#       - "8001:8000"
+#     networks:
+#       - my_poll_network
+#     command: >
+#       sh -c "sleep 5 && python manage.py runserver 0.0.0.0:8000"
+
+# networks:
+#   my_poll_network:
+#     external: true
+services:
+  # ---------- Check & Wait for LocalStack ----------
+  wait_localstack:
+    image: curlimages/curl:latest
+    container_name: wait_localstack_consumer
+    entrypoint: >
+      sh -c "
+        echo '⏳ Waiting for LocalStack...';
+        until curl -s http://localstack:4566/_localstack/health | grep -Po '\"overall\":\\s*\"running\"'; do
+          sleep 2;
+        done;
+        echo '✅ LocalStack is ready!';
+      "
+    networks:
+      - my_poll_network
+
+  # ---------- LocalStack ----------
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack_service
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=sqs,sns,s3,lambda,kinesis
+      - AWS_DEFAULT_REGION=us-east-1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4566/_localstack/health || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    networks:
+      - my_poll_network
+
+  # ---------- Setup Consumer ----------
+  setup_localstack_consumer:
+    build: .
+    container_name: setup_localstack_consumer_service
+    environment:
+      LOCALSTACK_ENDPOINT: http://localstack:4566
+      AWS_DEFAULT_REGION: us-east-1
+      APP_ROLE: CONSUMER
+      DD_TRACE_ENABLED: false
+    command: python manage.py setup_localstack
+    networks:
+      - my_poll_network
+    depends_on:
+      - localstack
+      - wait_localstack
+
+  # ---------- Consumer App ----------
+  consumer:
+    build: .
+    container_name: my_poll_app_consumer
+    environment:
+      DJANGO_ENV: local
+      APP_ROLE: CONSUMER
+      LOCALSTACK_ENDPOINT: http://localstack:4566
+      AWS_DEFAULT_REGION: us-east-1
+      DD_TRACE_ENABLED: false
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    ports:
+      - "8001:8000"
+    networks:
+      - my_poll_network
+    depends_on:
+      - setup_localstack_consumer
+    command: >
+      sh -c "sleep 5 && python manage.py runserver 0.0.0.0:8000"
+
+networks:
+  my_poll_network:
+    external: true
