@@ -1,6 +1,107 @@
+# version: "3.9"
+
+# services:
+#   # --------------------------
+#   # LocalStack Service
+#   # --------------------------
+#   localstack:
+#     image: localstack/localstack:latest
+#     container_name: localstack_service
+#     ports:
+#       - "4566:4566"
+#     environment:
+#       SERVICES: sqs,sns
+#       AWS_DEFAULT_REGION: us-east-1
+#       AWS_SECRET_ACCESS_KEY: test
+#     networks:
+#       - my_poll_network
+#     healthcheck:
+#       test: ["CMD-SHELL", "curl -f http://localhost:4566/_localstack/health || exit 1"]
+#       interval: 5s
+#       retries: 50
+#       start_period: 10s
+
+#   # --------------------------
+#   # Setup LocalStack for Publisher
+#   # --------------------------
+#   setup_localstack_publisher:
+#     build: .
+#     container_name: setup_localstack_publisher_service
+#     environment:
+#       LOCALSTACK_ENDPOINT: http://localstack:4566
+#       AWS_DEFAULT_REGION: us-east-1
+#       APP_ROLE: PUBLISHER
+#     depends_on:
+#       - localstack
+#     command: python manage.py setup_localstack
+#     networks:
+#       - my_poll_network
+
+#   # --------------------------
+#   # Setup LocalStack for Consumer
+#   # --------------------------
+#   setup_localstack_consumer:
+#     build: .
+#     container_name: setup_localstack_consumer_service
+#     environment:
+#       LOCALSTACK_ENDPOINT: http://localstack:4566
+#       AWS_DEFAULT_REGION: us-east-1
+#       APP_ROLE: CONSUMER
+#     depends_on:
+#       - localstack
+#     command: python manage.py setup_localstack
+#     networks:
+#       - my_poll_network
+
+#   # --------------------------
+#   # Publisher Microservice
+#   # --------------------------
+#   publisher:
+#     build: .
+#     container_name: my_poll_app_publisher
+#     environment:
+#       DJANGO_ENV: local
+#       APP_ROLE: PUBLISHER
+#       LOCALSTACK_ENDPOINT: http://localstack:4566
+#       AWS_DEFAULT_REGION: us-east-1
+#     depends_on:
+#       - setup_localstack_publisher
+#     ports:
+#       - "8000:8000"
+#     volumes:
+#       - .:/app
+#     command: >
+#       sh -c "sleep 5 && python manage.py runserver 0.0.0.0:8000"
+#     networks:
+#       - my_poll_network
+
+#   # --------------------------
+#   # Consumer Microservice
+#   # --------------------------
+#   consumer:
+#     build: .
+#     container_name: my_poll_app_consumer
+#     environment:
+#       DJANGO_ENV: local
+#       APP_ROLE: CONSUMER
+#       LOCALSTACK_ENDPOINT: http://localstack:4566
+#       AWS_DEFAULT_REGION: us-east-1
+#     depends_on:
+#       - setup_localstack_consumer
+#     ports:
+#       - "8001:8000"
+#     volumes:
+#       - .:/app
+#     command: >
+#       sh -c "sleep 5 && python manage.py runserver 0.0.0.0:8000"
+#     networks:
+#       - my_poll_network
+
+# networks:
+#   my_poll_network:
+#     external: true
 version: "3.9"
 services:
-  # ---------- LocalStack ----------
   localstack:
     image: localstack/localstack:latest
     container_name: localstack_service
@@ -12,6 +113,8 @@ services:
       - AWS_DEFAULT_REGION=us-east-1
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - my_poll_network
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:4566/_localstack/health || exit 1"]
       interval: 5s
@@ -19,7 +122,6 @@ services:
       retries: 50
       start_period: 10s
 
-  # ---------- Setup for Publisher ----------
   setup_localstack_publisher:
     build: .
     container_name: setup_localstack_publisher_service
@@ -30,10 +132,10 @@ services:
       DD_TRACE_ENABLED: false
     command: python manage.py setup_localstack
     depends_on:
-      localstack:
-        condition: service_healthy
+      - localstack
+    networks:
+      - my_poll_network
 
-  # ---------- Setup for Consumer ----------
   setup_localstack_consumer:
     build: .
     container_name: setup_localstack_consumer_service
@@ -44,10 +146,10 @@ services:
       DD_TRACE_ENABLED: false
     command: python manage.py setup_localstack
     depends_on:
-      localstack:
-        condition: service_healthy
+      - localstack
+    networks:
+      - my_poll_network
 
-  # ---------- Publisher App ----------
   publisher:
     build: .
     container_name: my_poll_app_publisher
@@ -57,19 +159,19 @@ services:
       LOCALSTACK_ENDPOINT: http://localstack:4566
       AWS_DEFAULT_REGION: us-east-1
       DD_TRACE_ENABLED: false
-    depends_on:
-      setup_localstack_publisher:
-        condition: service_completed_successfully
     env_file:
       - .env
     volumes:
       - .:/app
     ports:
       - "8000:8000"
+    networks:
+      - my_poll_network
+    depends_on:
+      - setup_localstack_publisher
     command: >
-      sh -c "sleep 5 && python wait_for_db.py && python manage.py runserver 0.0.0.0:8000"
+      sh -c "sleep 5 && python manage.py runserver 0.0.0.0:8000"
 
-  # ---------- Consumer App ----------
   consumer:
     build: .
     container_name: my_poll_app_consumer
@@ -79,14 +181,19 @@ services:
       LOCALSTACK_ENDPOINT: http://localstack:4566
       AWS_DEFAULT_REGION: us-east-1
       DD_TRACE_ENABLED: false
-    depends_on:
-      setup_localstack_consumer:
-        condition: service_completed_successfully
     env_file:
       - .env
     volumes:
       - .:/app
     ports:
       - "8001:8000"
+    networks:
+      - my_poll_network
+    depends_on:
+      - setup_localstack_consumer
     command: >
-      sh -c "sleep 5 && python wait_for_db.py && python manage.py runserver 0.0.0.0:8000"
+      sh -c "sleep 5 && python manage.py runserver 0.0.0.0:8000"
+
+networks:
+  my_poll_network:
+    external: true

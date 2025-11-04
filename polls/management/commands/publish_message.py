@@ -1,3 +1,4 @@
+#management/commands/publish_message.py
 import os
 import boto3
 from django.core.management.base import BaseCommand

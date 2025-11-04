@@ -1,26 +1,36 @@
-version: "3.9"
 services:
-  localstack1:
-    image: localstack/localstack:latest
-    container_name: localstack_service_test
-    ports:
-      - "4566:4566"
+  setup_localstack_publisher:
+    build: .
+    container_name: setup_localstack_publisher_servicee
     environment:
-      - SERVICES=s3
-      - AWS_DEFAULT_REGION=us-east-1
-  localstack2:
-    image: localstack/localstack:latest
-    container_name: localstack_service_test
-    ports:
-      - "4566:4566"
+      LOCALSTACK_ENDPOINT: http://localstack:4566
+      AWS_DEFAULT_REGION: us-east-1
+      APP_ROLE: PUBLISHER
+      DD_TRACE_ENABLED: false
+    command: python manage.py setup_localstack
+    networks:
+      - my_poll_network
+
+  publisherrr:
+    build: .
+    container_name: my_poll_app_publisherrr
     environment:
-      - SERVICES=s3
-      - AWS_DEFAULT_REGION=us-east-1
-  localstack3:
-    image: localstack/localstack:latest
-    container_name: localstack_service_test33
+      DJANGO_ENV: local
+      APP_ROLE: PUBLISHER
+      LOCALSTACK_ENDPOINT: http://localstack:4566
+      AWS_DEFAULT_REGION: us-east-1
+      DD_TRACE_ENABLED: false
+    env_file:
+      - .env
+    volumes:
+      - .:/app
     ports:
-      - "4566:4566"
-    environment:
-      - SERVICES=s3
-      - AWS_DEFAULT_REGION=us-east-1
+      - "8000:8000"
+    networks:
+      - my_poll_network
+    command: >
+      sh -c "sleep 5 && python manage.py runserver 0.0.0.0:8000"
+
+networks:
+  my_poll_network:
+    external: true
