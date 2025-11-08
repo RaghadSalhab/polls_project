@@ -21,6 +21,7 @@ services:
       retries: 50
       start_period: 10s
 
+
 networks:
   my_poll_network:
     external: true

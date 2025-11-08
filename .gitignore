@@ -5,3 +5,4 @@ __pycache__/
 .dockerignore
 *.pyo
 .env
+polls/management/commands/sync_aws_to_local.py

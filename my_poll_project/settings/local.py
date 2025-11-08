@@ -11,7 +11,6 @@ LOCALSTACK_ENABLED = os.getenv("USE_LOCALSTACK", "True") == "True"
 
 
 # Load environment variables
-BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env()
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
@@ -30,17 +29,6 @@ DATABASES = {
         'PORT': env("DATABASE_PORT", default="5432"),
     }
 }
-
-
-if LOCALSTACK_ENABLED:
-    print("🔄 Redirecting all *_BASE_URL to LocalStack (http://localhost:4566) ...")
-
-    for key, value in list(globals().items()):
-        if key.endswith('_BASE_URL') and isinstance(value, str):
-            if 'svc.cluster.local' in value or 'amazonaws.com' in value:
-                service_name = value.split('.')[0].split('//')[-1]
-                globals()[key] = f"http://localhost:4566/{service_name}"
-
 
 SLACK_TOKEN = ''
 ASYNC_STARTUP_THREADS = []

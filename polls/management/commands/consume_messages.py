@@ -1,3 +1,4 @@
+#management/commands/consume_messages.py
 import os
 import boto3
 from django.core.management.base import BaseCommand
@@ -29,7 +30,6 @@ class Command(BaseCommand):
                 body = msg['Body']
                 self.stdout.write(f"📩 Received: {body}")
 
-                # حذف الرسالة بعد المعالجة
                 sqs.delete_message(
                     QueueUrl=queue_url,
                     ReceiptHandle=msg['ReceiptHandle']

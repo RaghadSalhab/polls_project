@@ -2,7 +2,7 @@
 from django.core.management.base import BaseCommand
 import boto3
 import json
-
+#python manage.py setup_subscription
 TOPIC_QUEUE_CONFIG = {
     "prod-team-recognition-notifications": ["prod-team-recognition-updates", "prod-team-recognition-updates-balmm"],
     # "another-topic": ["another-queue"]

@@ -10,7 +10,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']  
 
 # Example API URLs
-RAGHAD_API_BASE_URL = "http://core-api.dev-core-api.svc.cluster.local"
+Harri_API_BASE_URL = "http://core-api.dev-core-api.svc.cluster.local"
 TEAM_SCHEDULING_BASE_URL = "http://team-scheduling.dev-core-api.svc.cluster.local"
 
 # AWS resources
