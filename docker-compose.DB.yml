@@ -1,3 +1,63 @@
+# #docker-compose.DB.yml
+# version: "3.9"
+
+# services:
+
+#   mysql_dev:
+#     image: mysql:8.0
+#     container_name: mysql_dev
+#     environment:
+#       MYSQL_ROOT_PASSWORD: root
+#       MYSQL_USER: dev_user
+#       MYSQL_PASSWORD: dev_pass
+#     ports:
+#       - "3307:3306"
+#     volumes:
+#       - ./mysql_dev_data:/var/lib/mysql
+#     networks:
+#       - vpn
+
+#   # ---------- MySQL Local ----------
+#   mysql_local:
+#     image: mysql:8.0
+#     container_name: mysql_local
+#     environment:
+#       MYSQL_ROOT_PASSWORD: root
+#       MYSQL_DATABASE: local_db
+#       MYSQL_USER: local_user
+#       MYSQL_PASSWORD: local_pass
+#     ports:
+#       - "3308:3306"
+#     volumes:
+#       - ./mysql_local_data:/var/lib/mysql
+#     networks:
+#       - vpn
+
+#   ai_proxy:
+#     build:
+#       context: .                  # root المشروع
+#       dockerfile: ai_proxy/Dockerfile
+#     container_name: ai_proxy_service
+#     ports:
+#       - "5000:8000"
+#     networks:
+#       - vpn
+#     environment:
+#       DJANGO_ENV: local            # يحدد settings/local.py
+#       ROLE: PROXY                  # أي اسم مناسب
+#       PYTHONPATH: /app
+
+
+
+# networks:
+#   vpn:
+#     name: vpn
+#     driver: bridge
+#     ipam:
+#       config:
+#         - subnet: 172.16.0.0/16
+#           gateway: 172.16.0.1
+
 version: "3.9"
 
 services:
@@ -7,17 +67,21 @@ services:
     container_name: mysql_dev
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: dev_db
       MYSQL_USER: dev_user
       MYSQL_PASSWORD: dev_pass
+      MYSQL_DATABASE: ms1_db
     ports:
-      - "3307:3306"
+      - "3307:3306"  # port على الجهاز المضيف
     volumes:
       - ./mysql_dev_data:/var/lib/mysql
     networks:
       - vpn
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
-  # ---------- MySQL Local ----------
   mysql_local:
     image: mysql:8.0
     container_name: mysql_local
@@ -32,6 +96,28 @@ services:
       - ./mysql_local_data:/var/lib/mysql
     networks:
       - vpn
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ai_proxy:
+  #   build:
+  #     context: .
+  #     dockerfile: ai_proxy/Dockerfile
+  #   container_name: ai_proxy_service
+  #   ports:
+  #     - "5000:8000"
+  #   networks:
+  #     - vpn
+  #   environment:
+  #     DJANGO_ENV: local
+  #     ROLE: PROXY
+  #     PYTHONPATH: /app
+  #   depends_on:
+  #     mysql_dev:
+  #       condition: service_healthy
 
 networks:
   vpn:

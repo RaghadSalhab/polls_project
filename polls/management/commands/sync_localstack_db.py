@@ -8,7 +8,6 @@ class Command(BaseCommand):
     help = "Sync LocalStack dev_db to local_db reliably, with dummy data"
 
     def wait_for_mysql(self, host, port, timeout=30):
-        """انتظار MySQL ليشتغل قبل أي restore"""
         start = time.time()
         while True:
             try:

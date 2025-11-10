@@ -1,3 +1,4 @@
+# docker-compose.consumer.yml
 version: "3.9"
 
 services:
@@ -51,6 +52,64 @@ services:
     depends_on:
       - localstack
       - wait_localstack
+
+  mysql_dev:
+    image: mysql:8.0
+    container_name: mysql_dev
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: dev_user
+      MYSQL_PASSWORD: dev_pass
+      MYSQL_DATABASE: ms1_db
+    ports:
+      - "3307:3306"  # port على الجهاز المضيف
+    volumes:
+      - ./mysql_dev_data:/var/lib/mysql
+    networks:
+      - vpn
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mysql_local:
+    image: mysql:8.0
+    container_name: mysql_local
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: local_db
+      MYSQL_USER: local_user
+      MYSQL_PASSWORD: local_pass
+    ports:
+      - "3308:3306"
+    volumes:
+      - ./mysql_local_data:/var/lib/mysql
+    networks:
+      - vpn
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  db_setup:
+    build: .
+    container_name: db_setup_service
+    environment:
+      DB_USER: root
+      DB_PASSWORD: root
+    networks:
+      - vpn
+    depends_on:
+      mysql_dev:
+        condition: service_healthy
+      mysql_local:
+        condition: service_healthy
+    volumes:
+      - ./scripts:/app/scripts
+      - ./db:/app/db
+    command: python /app/scripts/run_all.py
+
 
   # ---------- Consumer App ----------
   consumer:

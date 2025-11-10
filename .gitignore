@@ -6,3 +6,8 @@ __pycache__/
 *.pyo
 .env
 polls/management/commands/sync_aws_to_local.py
+my_poll_project/mysql_dev_data/
+my_poll_project/mysql_local_data/
+db/
+mysql_dev_data/
+mysql_local_data/

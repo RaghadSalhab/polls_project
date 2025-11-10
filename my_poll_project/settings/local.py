@@ -18,15 +18,44 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 DEBUG = env.bool("DEBUG", default=True)
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["*"])
 
-# Database
+
+import os
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django_prometheus.db.backends.mysql', 
+#         'HOST': 'mysql_dev',
+#         'PORT': '3306',     
+#         'NAME': 'ms1_db',
+#         'USER': os.getenv('DB_USER', 'root'),   
+#         'PASSWORD': os.getenv('DB_PASSWORD', 'root'),
+#     },
+#     'ms2_db': {
+#         'ENGINE': 'django_prometheus.db.backends.mysql',
+#         'HOST': 'mysql_dev',
+#         'PORT': '3306',       # البورت الداخلي للحاوية
+#         'NAME': 'ms2_db',
+#         'USER': os.getenv('DB_USER', 'root'),
+#         'PASSWORD': os.getenv('DB_PASSWORD', 'root'),
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env("DATABASE_NAME", default="polls_db"),
-        'USER': env("DATABASE_USER", default="postgres"),
-        'PASSWORD': env("DATABASE_PASSWORD", default="1234"),
-        'HOST': env("DATABASE_HOST", default="host.docker.internal"),
-        'PORT': env("DATABASE_PORT", default="5432"),
+        'ENGINE': 'django_prometheus.db.backends.mysql',
+        'HOST': 'mysql_dev',
+        'PORT': '3306',
+        'NAME': 'ms1_db',
+        'USER': os.getenv('DATABASE_USER', 'root'),   # <=== هنا
+        'PASSWORD': os.getenv('DATABASE_PASSWORD', 'root'),  # <=== هنا
+    },
+    'ms2_db': {
+        'ENGINE': 'django_prometheus.db.backends.mysql',
+        'HOST': 'mysql_dev',
+        'PORT': '3306',
+        'NAME': 'ms2_db',
+        'USER': os.getenv('DATABASE_USER', 'root'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD', 'root'),
     }
 }
 

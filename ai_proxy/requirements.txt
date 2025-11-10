@@ -1,0 +1,4 @@
+Django>=4.2
+requests>=2.31.0
+openai>=1.0.0   # لو ناوي تربطي الـ AI model لاحقاً
+django-prometheus==2.3.2  # أو أحدث نسخة متوافقة

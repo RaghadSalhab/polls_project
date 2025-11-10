@@ -20,6 +20,7 @@ user_questions_router = routers.NestedDefaultRouter(router, r'users', lookup='us
 user_questions_router.register(r'questions', UserQuestionsViewSet, basename='user-questions')
 
 urlpatterns = [
+    path('ai-proxy/', include('ai_proxy.urls')),  
     path('', include(router.urls)),
     path('', include(choices_router.urls)),
     path('', include(user_questions_router.urls)),
