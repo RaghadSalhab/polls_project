@@ -42,12 +42,12 @@ import os
 # }
 DATABASES = {
     'default': {
-        'ENGINE': 'django_prometheus.db.backends.mysql',
-        'HOST': 'mysql_dev',
+        'ENGINE': 'django.db.backends.mysql',  # أو django_prometheus.db.backends.mysql
+        'HOST': 'mysql_local',    # أو localhost لو خارج الـ container
         'PORT': '3306',
-        'NAME': 'ms1_db',
-        'USER': os.getenv('DATABASE_USER', 'root'),   # <=== هنا
-        'PASSWORD': os.getenv('DATABASE_PASSWORD', 'root'),  # <=== هنا
+        'NAME': 'polls_db',
+        'USER': 'root',
+        'PASSWORD': 'root',       # <=== لازم يكون هنا
     },
     'ms2_db': {
         'ENGINE': 'django_prometheus.db.backends.mysql',

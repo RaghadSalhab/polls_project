@@ -40,8 +40,8 @@ conn = mysql.connector.connect(
 )
 cursor = conn.cursor()
 
-num_databases = 145
-num_tables = 50    
+num_databases = 20
+num_tables = 30    
 num_columns = 15     
 
 for db_index in range(1, num_databases + 1):
