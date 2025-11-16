@@ -26,6 +26,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'polls',
+#    'ai_proxy',  # هذا مهم
+
 ]
 
 # Middleware

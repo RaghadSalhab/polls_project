@@ -1,0 +1,121 @@
+openapi: 3.0.0
+info:
+  title: Payment Service API
+  version: 1.0.0
+  description: API specification for handling payment operations
+
+servers:
+  - url: http://payment.svc.cluster.local:4010
+    description: Mock Payment API (inside Docker network)
+
+paths:
+  /pay:
+    post:
+      summary: Process a payment
+      description: Handles payment transactions through various methods
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                  example: 150.75
+                method:
+                  type: string
+                  enum: [credit_card, paypal, cash]
+                currency:
+                  type: string
+                  example: "USD"
+      responses:
+        "200":
+          description: Payment successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  transactionId:
+                    type: string
+                    example: "TXN_12345ABC"
+                  timestamp:
+                    type: string
+                    example: "2025-11-12T16:00:00Z"
+        "400":
+          description: Invalid payment request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid payment data"
+
+  /refund:
+    post:
+      summary: Request a refund
+      description: Initiates a refund for a previous transaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                transactionId:
+                  type: string
+                  example: "TXN_12345ABC"
+                reason:
+                  type: string
+                  example: "Duplicate transaction"
+      responses:
+        "200":
+          description: Refund processed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "refunded"
+                  refundId:
+                    type: string
+                    example: "RFND_67890XYZ"
+
+  /status/{transactionId}:
+    get:
+      summary: Check payment status
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Payment status info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transactionId:
+                    type: string
+                  status:
+                    type: string
+                    example: "success"
+                  amount:
+                    type: number
+                    example: 150.75
+                  method:
+                    type: string
+                    example: "credit_card"
+        "404":
+          description: Transaction not found

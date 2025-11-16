@@ -1,0 +1,130 @@
+openapi: 3.0.0
+info:
+  title: Payment Service API (Dynamic Mock)
+  version: 1.1.0
+  description: Mock Payment API with dynamic responses using Prism
+
+servers:
+  - url: http://payment.svc.cluster.local:4010
+    description: Mock Payment API (inside Docker network)
+
+paths:
+  /pay:
+    post:
+      summary: Process a payment
+      description: Handles payment transactions dynamically (success/failure)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount, method, currency]
+              properties:
+                amount:
+                  type: number
+                  example: 150.75
+                method:
+                  type: string
+                  enum: [credit_card, paypal, cash]
+                currency:
+                  type: string
+                  example: "USD"
+      responses:
+        "200":
+          description: Payment processed successfully or failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [success, failed]
+                  transactionId:
+                    type: string
+                    example: "TXN_${{random.uuid}}"
+                  message:
+                    type: string
+                    example: "Payment processed"
+                  timestamp:
+                    type: string
+                    example: "2025-11-12T18:30:00Z"
+
+  /refund:
+    post:
+      summary: Request a refund
+      description: Returns refund info dynamically
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [transactionId]
+              properties:
+                transactionId:
+                  type: string
+                  example: "TXN_12345ABC"
+                reason:
+                  type: string
+                  example: "Duplicate transaction"
+      responses:
+        "200":
+          description: Refund processed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  refundId:
+                    type: string
+                    example: "RFND_${{random.uuid}}"
+                  status:
+                    type: string
+                    enum: [refunded, rejected]
+                  timestamp:
+                    type: string
+                    example: "2025-11-12T18:45:00Z"
+
+  /status/{transactionId}:
+    get:
+      summary: Check payment status
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Payment status info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transactionId:
+                    type: string
+                  status:
+                    type: string
+                    enum: [pending, success, failed]
+                  amount:
+                    type: number
+                    example: 150.75
+                  method:
+                    type: string
+                    example: "credit_card"
+                  lastUpdate:
+                    type: string
+                    example: "2025-11-12T18:50:00Z"
+        "404":
+          description: Transaction not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Transaction not found"

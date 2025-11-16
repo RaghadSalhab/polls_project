@@ -110,6 +110,57 @@ services:
       - ./db:/app/db
     command: python /app/scripts/run_all.py
 
+  # --------- AI Python Service (Dynamic) ---------
+  ai_service:
+    build:
+      context: ./mocks/ai
+      dockerfile: Dockerfile
+    container_name: ai_service
+    ports:
+      - "9003:9003"
+    networks:
+      vpn:
+        aliases:
+          - ai_service
+
+  # --------- AI Mock (WireMock) ---------
+  ai-mock:
+    image: wiremock/wiremock
+    container_name: ai_mock_service
+    ports:
+      - "9001:8080"
+    networks:
+      vpn:
+        aliases:
+          - ai.svc.cluster.local
+    volumes:
+      - ./mocks/ai:/home/wiremock/mappings
+
+
+  # # --------- Payment Mock ---------
+  # payment-mock:
+  #   image: wiremock/wiremock
+  #   container_name: payment_mock_service
+  #   ports:
+  #     - "9002:8080"
+  #   networks:
+  #     vpn:
+  #       aliases:
+  #         - payment.svc.cluster.local
+  #   volumes:
+  #     - ./mocks/payment:/home/wiremock/mappings
+
+  # --------- Payment Mock (OpenAPI via Prism) ---------
+  payment_service:
+    image: stoplight/prism:4
+    container_name: payment_service
+    command: mock -h 0.0.0.0 -p 4010 -d /tmp/payment-api.yaml
+    volumes:
+      - ./mocks/payment/payment-api.yaml:/tmp/payment-api.yaml
+    ports:
+      - "4010:4010"
+    networks:
+      - vpn
 
   # ---------- Publisher App ----------
   publisher:

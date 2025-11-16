@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+#scripts/seed_shared.py
 import mysql.connector
 from faker import Faker
 import random, os, time

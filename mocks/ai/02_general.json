@@ -1,0 +1,16 @@
+
+{
+  "priority": 5,
+  "request": {
+    "method": "POST",
+    "urlPattern": ".*"
+  },
+  "response": {
+    "status": 200,
+    "body": "{\"response\": \"[Mocked AI reply from general ] You said: {{jsonPath request.body '$.prompt'}}\"}",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "transformers": ["response-template"]
+  }
+}

@@ -3,7 +3,7 @@ import subprocess
 import os
 import time
 import sys
-
+#python manage.py run_all
 SCRIPTS_DIR = os.path.join(os.path.dirname(__file__), "../../../scripts")
 SCRIPTS_DIR = os.path.abspath(SCRIPTS_DIR)
 
